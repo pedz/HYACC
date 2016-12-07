@@ -7,9 +7,9 @@
 #include "y.h"
 
 void show_manpage() {
-   system("less /home/ThomasXC/yacc3/test/tmp/hyacc_unix_src_01_27_2011/hyaccmanpage");
+   system("less /usr/local/lib/hyacc/hyaccmanpage");
 }
 
 char * HYACC_PATH = 
-  "/home/ThomasXC/yacc3/test/tmp/hyacc_unix_src_01_27_2011/hyaccpar";
+  "/usr/local/lib/hyacc/hyaccpar";
 
