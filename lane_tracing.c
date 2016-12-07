@@ -141,7 +141,7 @@ llist_context_set * llist_context_set_create(
 }
 
 
-llist_context_set_destroy(llist_context_set * s) {
+void llist_context_set_destroy(llist_context_set * s) {
   freeSymbolNodeList(s->ctxt);
   free(s);
 }
@@ -1873,7 +1873,7 @@ static void getInadequateStateReduceConfigContext(State * s) {
 }
 
 
-static lane_tracing_phase1() {
+static void lane_tracing_phase1() {
   int i, ct, state_no;
   State * s;
 

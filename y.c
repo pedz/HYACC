@@ -2146,7 +2146,7 @@ State * createState() {
   }
   s->successor_count = 0;
 
-  s->parents_list = StateList_create(s->parents_list);
+  s->parents_list = StateList_create();
 
   s->PASS_THRU = 0;
   s->REGENERATED = 0;
@@ -2817,14 +2817,14 @@ void show_state_config_info() {
  * print size of different objects. For development use only.
  */
 void print_size() {
-  printf("size of Grammar: %d\n", sizeof(Grammar));
-  printf("size of State_collection: %d\n", sizeof(State_collection));
-  printf("size of State: %d\n", sizeof(State));
-  printf("size of (State *): %d\n", sizeof(State *));
-  printf("size of Context: %d\n", sizeof(Context));
-  printf("size of Production: %d\n", sizeof(Production));
-  printf("size of Configuration: %d\n", sizeof(Configuration));
-  printf("size of ParsingTblColHdr: %d\n", sizeof(ParsingTblColHdr));
+  printf("size of Grammar: %lu\n", sizeof(Grammar));
+  printf("size of State_collection: %lu\n", sizeof(State_collection));
+  printf("size of State: %lu\n", sizeof(State));
+  printf("size of (State *): %lu\n", sizeof(State *));
+  printf("size of Context: %lu\n", sizeof(Context));
+  printf("size of Production: %lu\n", sizeof(Production));
+  printf("size of Configuration: %lu\n", sizeof(Configuration));
+  printf("size of ParsingTblColHdr: %lu\n", sizeof(ParsingTblColHdr));
 }
 
 
@@ -2939,7 +2939,7 @@ void writeParsingTblRow_LALR(int state) {
   // write reduce actions.
   if (only_one_reduction == TRUE) {
     if (reduction < 0) { yyprintf2("  . reduce (%d)\n", (-1) * reduction); }
-    else { yyprintf2("  . error\n", reduction); } // no reduction.
+    else { yyprintf2("  . error %d\n", reduction); } // no reduction.
   } else {
     for (col = 0; col < ParsingTblCols; col ++) {
       v = ParsingTable[row_start + col];

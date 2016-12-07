@@ -426,7 +426,7 @@ void processYaccFileInput_section1() {
         //putchar(c);
         // avoid '\'' and '\\'.
         if (c == '\'' && (last_c != '\\' ||
-            ysymbol_pt == 2 && ysymbol[0] == '\\')) {
+			  (ysymbol_pt == 2 && ysymbol[0] == '\\'))) {
           //printf("] terminal ends\n");
           output_terminal(state, prev_state); // output quoted terminal.
           state = prev_state;
@@ -1302,7 +1302,7 @@ void processYaccFileInput_section2() {
         //putchar(c); 
         // avoid '\'' and '\\'.
         if (c == '\'' && (last_c != '\\' ||
-            ysymbol_pt == 2 && ysymbol[0] == '\\')) { 
+			  (ysymbol_pt == 2 && ysymbol[0] == '\\'))) { 
           //printf("] terminal ends\n");
           yacc_sec2_state = RHS;
           output_nonterminal(TERMINAL); // OUTPUT NEXT RHS SYMBOL. is terminal.
