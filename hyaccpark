@@ -1,0 +1,818 @@
+/*
+ * Copyright (c) 2009, Xin Chen
+ * All rights reserved. This file is distributed under BSD license.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the copyright holder nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY the copyright holder ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL the copyright holder BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * hyaccpark
+ *
+ * HYACC LR(k) Parser engine.
+ *
+ * @Author: Xin Chen
+ * @Created on: 1/9/2009
+ * @Last modified: 1/9/2009
+ * @Copyright (C) 2009
+ */
+
+#define YYLEX() yylex()
+
+#ifndef YYSTYPE
+#define YYSTYPE int
+#endif
+
+#define YYNOACTION -10000000 
+#define YY_LRK_CONFLICT -10000010
+#define YYEOF     0   /* for strEnd, input end marker. */
+#define YYERRCODE 256 /* for use by "error" token. */
+
+#define yyclearin yychar = -1
+#define yyerrok yyerrflag = 0
+#define YYRESUME return(0)
+#define YYABORT return(1)
+#define YYACCEPT return(0)
+#define YYERROR goto yyerrlab
+#define YYRECOVERING() (!!yyerrflag) /* !! */
+#define YYMAX_STACK_CAPACITY 16384   /* 2^14 */
+int yystack_capacity = 256; /* initial stack capacity. */
+#define YYENLARGE(from, type) \
+        (type *) realloc((void *) from, (yystack_capacity) * sizeof(type))
+#define YYERR_EXIT(errmsg) { printf("%s\n", errmsg); exit(1); }
+#define HYY_NEW(name, type, size) \
+{\
+  name = (type *) malloc(sizeof(type) * (size)); \
+  if (name == NULL) YYERR_EXIT("out of memory"); \
+}
+
+int yychar;     /* current input token number, i.e., lookahead. */
+FILE * yyparse_fp; /* output file to trace parse steps. */
+char * yyparse_file = "y.parse";
+int * yyps;     /* state stack. */
+int yyps_pt;    /* top of state stack: yyps+yyps_pt-1. */
+YYSTYPE * yypv; /* value stack. */
+int yypv_pt;    /* top of value stack: yypv+yypv_pt-1. */
+#if YYDEBUG
+int * yypm;     /* symbol stack. */
+int yypm_pt;    /* top of symbol stack: yypm+yypm_pt-1. */
+#endif
+
+int yynerrs;    /* number of errors */
+int yyerrflag;  /* error recovery flag */
+
+extern int yychar;
+extern int yyerrflag;
+
+YYSTYPE yylval; /* the value of yylval is from yylex. */
+YYSTYPE yyval;  /* "$$" used in production action. */
+
+
+/* get token name from value of yychar. */
+char * yyget_tok(const int yychar) {
+  static char c[1];
+  int i;
+  if (yychar == YYEOF) return "EOF";
+  if (yychar == 256) return "error";
+  if (yychar < 0) { /* search for non-terminal. */
+    for (i = 0; yynts[i].t_val <= 0; i ++)  
+      if (yychar == yynts[i].t_val) return yynts[i].t_name;
+  }
+  /* yychar > 256, search for terminal. */
+  for (i = 0; yytoks[i].t_val >= 0; i ++) 
+    if (yychar == yytoks[i].t_val) return yytoks[i].t_name;
+  if (yychar > 0 && yychar < 256) { c[0] = yychar; return c; }
+  
+  return "-none-";
+}
+
+#if YYDEBUG
+
+void yywrite_stack() { 
+  int i; 
+  /* It's unknown what data type yypv is, so can't write here. */ 
+  /* The user can customize the code here himself. */ 
+  /* fprintf(yyparse_fp, "value stack: "); 
+  for (i = 0; i < yypv_pt - 1; i ++) 
+    fprintf(yyparse_fp, "%d, ", yypv[i]); 
+  if (yypv_pt > 0) fprintf(yyparse_fp, "%d", yypv[i]); 
+  fprintf(yyparse_fp, "\n"); 
+  */
+
+  fprintf(yyparse_fp, "symbol stack: ");
+  for (i = 0; i < yypm_pt - 1; i ++)
+    fprintf(yyparse_fp, "%s, ", yyget_tok(yypm[i]));
+  if (yypm_pt > 0) fprintf(yyparse_fp, "%s", yyget_tok(yypm[i]));
+  fprintf(yyparse_fp, "\n");
+  
+  fprintf(yyparse_fp, "state stack: "); 
+  for (i = 0; i < yyps_pt - 1; i ++) 
+    fprintf(yyparse_fp, "%d, ", yyps[i]); 
+  if (yyps_pt > 0) fprintf(yyparse_fp, "%d", yyps[i]); 
+  fprintf(yyparse_fp, "\n"); 
+}
+
+#define YYEXPAND_SYMBOL_STACK  \
+    if ((yypm = YYENLARGE(yypm, int)) == NULL)  \
+      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n");
+
+#else
+#define YYEXPAND_SYMBOL_STACK
+#endif
+
+
+#define YYEXPAND_STACK \
+{ \
+  if (yyps_pt >= YYMAX_STACK_CAPACITY) { \
+    printf("YYEXPAND_STACK error: YYMAX_STACK_CAPACITY reached.\n"); \
+    exit(1); \
+  } \
+  if (yyps_pt >= yystack_capacity) { \
+    yystack_capacity *= 2; \
+    if ((yyps = YYENLARGE(yyps, int)) == NULL) \
+      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n"); \
+    if ((yypv = YYENLARGE(yypv, YYSTYPE)) == NULL) \
+      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n"); \
+    YYEXPAND_SYMBOL_STACK \
+    /*printf("stack size expanded to %d\n", yystack_capacity); */ \
+  } \
+}
+
+
+/*
+ * A macro to get an action from (state, token) pair in the
+ * parsing table. Use macro instead of function to improve
+ * performance.
+ * Input: state, token
+ * Output: action
+ * if action > 0, then is a shift/goto target state.
+ * if action < 0, then is the reduction rule number.
+ * if action == 0, then is accept.
+ * if action == YY_LRK_CONFLICT, then is LR(k) conflict.
+ * if action == YYNOACTION, then no action exists.
+ */
+#define YYGET_ACTION(state, token, action) \
+{ \
+  /* offset_h to (offset_t - 1) is the range to search. */ \
+  int offset_h = yyrowoffset[state]; \
+  int offset_t = yyrowoffset[state + 1]; \
+  \
+  /* now use linear search. Will change to binary search. */ \
+  int offset; \
+  for (offset = offset_h; offset < offset_t; offset ++) \
+    if (yyptbltok[offset] == token) break; \
+  \
+  if (offset == offset_t) action = YYNOACTION; \
+  else action = yyptblact[offset]; \
+}
+
+
+/*
+ * LR(k) functions. START.
+ */
+
+typedef struct _LRk_P_T_row LRk_P_T_row;
+struct _LRk_P_T_row {
+  int state;
+  int token;
+  int * row;     /* list of reduction ruleID. */
+  LRk_P_T_row * next;
+};
+typedef struct {
+  int k;         /* k in LR(k). */
+  int row_count; /* number of rows. */
+  LRk_P_T_row * rows;
+} LRk_P_T;
+typedef struct {
+  LRk_P_T ** array;
+  int max_k;     /* number of entries in array is max_k - 1. */
+  int size;      /* 0 <= max_k - 2 <= size - 1 */
+} LRk_P_T_Array;
+static LRk_P_T_Array * yy_lrk_pta;
+static int yyPTC_count;
+
+/*
+ * yyLRK_Q functions.
+ */
+
+static int * yyLRK_Q; /* queue for reading LR(k) lookaheads. */
+static int yyLRK_Q_h; /* head pointer */
+static int yyLRK_Q_t; /* tail pointer */
+static int yyLRK_Q_count; /* count */
+static int yyLRK_Q_size;  /* size  */
+
+static void yyLRK_Q_init() {
+  yyLRK_Q_h = 0;
+  yyLRK_Q_t = 0;
+  yyLRK_Q_count = 0;
+  yyLRK_Q_size = 256;
+  if ((yyLRK_Q = (int *) malloc((yyLRK_Q_size) * sizeof(int))) == NULL)
+    YYERR_EXIT("yyparse error: out of memory\n");
+}
+static void yyLRK_Q_EXPAND() {
+  int i, pt, * tmp;
+  if ((tmp = (int *) malloc((yyLRK_Q_size * 2) * sizeof(int))) == NULL)
+    YYERR_EXIT("yyparse error: out of memory\n");
+  pt = yyLRK_Q_h; /* head pointer. */
+  for (i = 0; i < yyLRK_Q_size; i ++) { /* copy elements. */
+    tmp[i] = yyLRK_Q[pt ++];
+    if (pt == yyLRK_Q_size) pt = 0;
+  }
+  yyLRK_Q_h = 0;
+  yyLRK_Q_t = yyLRK_Q_size;
+  yyLRK_Q_size *= 2;
+  free(yyLRK_Q);
+  yyLRK_Q = tmp;
+}
+static void yyLRK_Q_push(int yychar) {
+  if (yyLRK_Q_count == yyLRK_Q_size) { yyLRK_Q_EXPAND(); }
+
+  yyLRK_Q[yyLRK_Q_t ++] = yychar;
+  yyLRK_Q_count ++;
+  if (yyLRK_Q_t == yyLRK_Q_size) yyLRK_Q_t = 0;
+}
+/*
+ * To avoid underflow, call like this:
+ *   if (LRK_Q_count > 0) item = LRK_Q_pop();
+ */
+static int yyLRK_Q_pop() {
+  int item;
+  item = yyLRK_Q[yyLRK_Q_h ++];
+  if (yyLRK_Q_h == yyLRK_Q_size) yyLRK_Q_h = 0;
+  yyLRK_Q_count --;
+  return item;
+}
+
+
+/*
+ * return the index of symbol (whose ID is e) in yyPTC.
+ */
+static int yyget_col(int e) {
+  int i, len;
+  len = yy_lrk_cols - 2;
+  for (i = 0; i < len; i ++) {
+    if (e == yyPTC[i]) return i;
+  }
+  return -1; /* not found */
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Functions for LR(k) table. START. 
+//////////////////////////////////////////////////////////////////
+
+static LRk_P_T * LRk_P_T_create(int k) {
+  LRk_P_T * t;
+  HYY_NEW(t, LRk_P_T, 1);
+  t->k = k;
+  t->row_count = 0;
+  t->rows = NULL;
+  return t;
+}
+
+
+static void LRk_P_T_dump(LRk_P_T * t) {
+  LRk_P_T_row * r;
+  int n, i, red;
+
+  if (NULL == t) return;
+  if (NULL == t->rows) {
+    printf("(empty LR(%d) parsing table)\n", t->k);
+    return;
+  }
+
+  for (r = t->rows; r != NULL; r = r->next) {
+    printf("[%d, %s]", r->state, yyget_tok(r->token));
+    for (i = 0; i < yyPTC_count; i ++) {
+      n = r->row[i];
+      if (n == YY_LRK_CONFLICT) {
+        printf("X ");
+      } else {
+        printf("%d ", n);
+      }
+    }
+    puts("");
+  }
+  puts("");
+}
+
+
+/*
+ * @Return: found -  1 if found, 0 if not.
+ *          If found is 1, return the row.
+ *          otherwise, return the row before the insertion point.
+ */
+static LRk_P_T_row * LRk_P_T_find(LRk_P_T * t,
+    int state, int token, int * found) {
+  LRk_P_T_row * r, * r_prev;
+  int cmp;
+  
+  * found = 0;
+  if (NULL == t) return NULL;
+
+  r = t->rows;
+  if (NULL == r) return NULL;
+  
+  for (r_prev = NULL; r != NULL; r_prev = r, r = r->next) {
+    if (r->state < state) continue;
+    else if (r->state > state) break; /* not found */
+    else {                            /* found same state. */
+      cmp = strcmp(yyget_tok(r->token), yyget_tok(token));
+      if (cmp < 0) continue;
+      else if (cmp > 0) break;
+      else {
+        * found = 1;
+        return r; 
+      } 
+    }
+  }
+
+  return r_prev;
+}
+
+
+/*
+ * Pre-assumption: t is not NULL.
+ * Insert the new row after r.
+ * @Return: the inserted new row.
+ */
+static LRk_P_T_row * LRk_P_T_addRow(LRk_P_T * t, LRk_P_T_row * r_prev,
+    int state, int token) {
+  LRk_P_T_row * r;
+  int i;
+  
+  HYY_NEW(r, LRk_P_T_row, 1);
+  r->state = state;
+  r->token = token;
+  
+  HYY_NEW(r->row, int, yyPTC_count); 
+  for (i = 0; i < yyPTC_count; i ++) {
+    r->row[i] = 0; /* initialize to 0 */
+  }
+  
+  r->next = NULL;
+  if (r_prev != NULL) {
+    r->next = r_prev->next;
+    r_prev->next = r;
+  } else {
+    t->rows = r;
+  }
+  
+  return r;
+}
+
+
+/*
+ * Get the entry [(state, token), col_token] in t.
+ * Assumptions: t != NULL.
+ */
+static int LRk_P_T_getEntry(LRk_P_T * t, int state,
+    int token, int col_token, int * exist) {
+  int index, found;
+  LRk_P_T_row * r;
+  
+  * exist = 0;
+  if (t == NULL) return 0; /* parsing table not exist. */
+  
+  r = LRk_P_T_find(t, state, token, & found);
+  if (found == 0) return 0; /* row not exist in t. */
+  
+  * exist = 1; /* this row exists. */
+  index = yyget_col(col_token);
+  
+  return r->row[index];
+}
+
+
+//////////////////////////////////////////////////////////////////
+// Functions for LR(k) table array. START.
+//////////////////////////////////////////////////////////////////
+
+static LRk_P_T_Array * LRk_P_T_Array_create(int size) {
+  LRk_P_T_Array * a;
+  int i;
+  HYY_NEW(a, LRk_P_T_Array, 1);
+  a->size = 10; /* initial max number of entries: 10. */
+  HYY_NEW(a->array, LRk_P_T *, a->size);
+  for (i = 0; i < a->size; i ++) { 
+    a->array[i] = NULL;
+  }
+  a->max_k = 1;
+  return a;
+}
+
+
+/*
+ * Add t to a.
+ */
+static void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t) {
+  if (NULL == a || NULL == t) return;
+  
+  /* 0 <= max_k - 2 <= size - 1 ==> max_k <= size + 1 */
+  if (a->max_k >= a->size + 1) {  /* expand a->array. */
+    a->array = (LRk_P_T **) \
+       realloc((void *) a->array, sizeof(LRk_P_T *) * (2 * a->size));
+    a->size *= 2;
+  }
+  if (a->array[t->k - 2] == NULL) {
+    a->array[t->k - 2] = t;
+    if (a->max_k < t->k) {
+      a->max_k = t->k;
+    }
+  } else {
+    printf("Error: LR(%d) table already exists\n", t->k);
+  }
+}
+
+
+static void yyWriteParsingTblColHdr() {
+  int i;
+  printf("--Parsing Table Column Header [Total: %d]--\n", yy_lrk_cols - 2);
+  for (i = 0; i < yyPTC_count; i ++) {
+    if (yyPTC[i] == 0) {
+      printf("$end ");
+    } else if (yyPTC[i] == CONST_ACC) {
+      printf("$accept ");
+    } else {
+      printf("%s ", yyget_tok(yyPTC[i]));
+    }
+  }
+  puts("\n");
+}
+
+
+static void LRk_P_T_Array_dump(LRk_P_T_Array * a) {
+  LRk_P_T * t;
+  int i;
+  if (NULL == a) return;
+
+  printf("\n==LRk Parsing Table Array [max_k = %d]==\n", a->max_k);
+  yyWriteParsingTblColHdr();
+
+  for (i = 2; i <= a->max_k; i ++) {
+    printf("--LR(%d) parsing table--\n", i);
+    LRk_P_T_dump(a->array[i - 2]);
+  }
+}
+
+
+/*
+ * read the LRk_P_T array tables into the LR(k) parsing table.
+ */
+static void LRk_P_T_Array_read() {
+  LRk_P_T * t;
+  LRk_P_T_row * r;
+  int state, token, k, rows, row, col, offset, next_index, next_ruleID;
+
+  rows = 0;
+  row = 0;
+  offset = 0;
+  yy_lrk_pta->max_k = yy_lrk_k;
+  for (k = 2; k <= yy_lrk_k; k ++) {
+    t = LRk_P_T_create(k);
+    LRk_P_T_Array_add(yy_lrk_pta, t);
+
+    r = NULL;
+    t->row_count = yy_lrk_rows[k - 2];
+    rows += t->row_count;
+    for (; row < rows; row ++) {
+      state = yy_lrk_r[offset ++]; /* 1st item of row. */
+      token = yy_lrk_r[offset ++]; /* 2nd item of row. */
+      r = LRk_P_T_addRow(t, r, state, token);
+
+      next_index = yy_lrk_r[offset ++];  /* 3rd item of row. */
+      next_ruleID = yy_lrk_r[offset ++]; /* 4th item of row. */
+      for (col = 2; col < yy_lrk_cols; col ++) {
+        if ((col - 2) == next_index) {
+          if ((r->row[col - 2] = next_ruleID) == -2) {
+            r->row[col - 2] = YY_LRK_CONFLICT;
+          }
+
+          next_index = yy_lrk_r[offset ++];
+          if (next_index  == -1) { /* end of row. */
+            break; /* break out of the inner-most for loop. */
+          } else {
+            next_ruleID = yy_lrk_r[offset ++];
+          }
+        } /* end of if */
+      } /* end of for loop */
+    } /* end of for loop */
+  } /* end of for loop */
+
+#if YYDEBUG_LRK
+  LRk_P_T_Array_dump(yy_lrk_pta);
+#endif
+}
+
+
+/*
+ * Given the (state, token) pair in LR(1) parsing table where
+ * a reduce/reduce conflict occurs, find the eventual reduction
+ * using LR(k) lookaheads.
+ *
+ * return: (-1) * ruleID, if the corresponding reduction is found. 
+ *         0 - error.
+ */ 
+static int yyget_LRK_reduction(int yystate, int token) {
+  int k, yychar, exist, entry;
+#if YYDEBUG_LRK
+  printf("yyget_LRK_reduction(%d, %d/%s)\n", \
+         yystate, token, yyget_tok(token));
+#endif
+  
+  for (k = 2; k <= yy_lrk_pta->max_k; k ++) {
+    yychar = yylex(); /* next lookahead. */
+    if (yychar <= 0) {
+      puts("get_LRk_reduction error: premature EOF");
+      yychar = YYEOF; /* end of file. */
+      return 0;
+    }
+    yyLRK_Q_push(yychar);
+
+    /* find item [(yystate, token), yychar]. */
+#if YYDEBUG_LRK
+    printf("LR(%d): find entry [(%d, %d/%s), %d/%s/(seq: %d)]\n", \
+             k, yystate, token, yyget_tok(token), yychar, \
+             yyget_tok(yychar), yyget_col(yychar));
+#endif
+    entry = LRk_P_T_getEntry(yy_lrk_pta->array[k - 2],
+              yystate, token, yychar, & exist);
+
+    if (exist == 0) {
+      puts("yyget_LRK_reduction error: exist is 0");
+      return 0;
+    } else {
+      if (entry != YY_LRK_CONFLICT) { return (-1) * entry; }
+      else { token = yychar; }
+    }
+  }
+
+  puts("get_LRk_reduction: not found");
+  return 0;
+}
+
+/*
+ * LR(k) functions. END.
+ */
+
+
+/*
+ * Handles error when no action is found in yyparse().
+ * state: yystate. lookahead: yychar.
+ * return: 0 if success, -1 if fail, 1 if eat a token.
+ */
+static int yyerror_handler(int yystate) {
+  int yyaction;
+  switch (yyerrflag) {
+    case 0:
+      yyerror("syntax error"); 
+#if YYDEBUG
+      fprintf(yyparse_fp, "syntax error: \
+        no action exists for state/token pair (%d, %s).\n",
+        yystate, yyget_tok(yychar)); 
+#endif
+      goto skip_init;
+    yyerrlab: /* we have a user generated syntax type error */
+    skip_init:
+      yynerrs ++;
+    case 1:
+    case 2: /* incompletely recovered error */
+      yyerrflag = 3; /* ! */
+      /* find state where "error" is a legal shift action */
+      while (yyps_pt > 0) { /* while state stack is not empty. */
+#if YYDEBUG
+        fprintf(yyparse_fp, 
+                "look for error action on state %d\n", yystate);
+#endif
+        YYGET_ACTION(yystate, YYERRCODE, yyaction);
+        if (yyaction > 0) { /* shift on "error" found for yystate. */
+          /* simulate shift for "error" token. */
+          /* push target state on state stack. */
+          * (yyps + yyps_pt) = yyaction; 
+          if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
+          * (yypv + yypv_pt) = yyval; /* should not matter */
+          yypv_pt ++;
+#if YYDEBUG
+          * (yypm + yypm_pt) = YYERRCODE;
+          yypm_pt ++;
+          fprintf(yyparse_fp, "- shift on error\n");
+#endif
+          return 0; /* return control to yyparse(), resume parsing. */
+        } else {    /* no error shift action found, pop this state. */
+#if YYDEBUG
+          fprintf(yyparse_fp, 
+                  "- pop state %d\n", * (yyps + yyps_pt - 1));
+#endif
+          yyps_pt --; /* pop state stack. */
+          yypv_pt --; /* pop value stack. */
+#if YYDEBUG
+          yypm_pt --;
+          yywrite_stack();
+#endif
+          yystate = * (yyps + yyps_pt - 1); /* get current state. */
+        }
+      }
+      /* the state stack is empty now, no error shift action found. */
+#if YYDEBUG
+      fprintf(yyparse_fp, "state stack is empty. abort.\n");
+#endif
+      return -1; /* yyparse return 1. */
+    case 3: /* no shift yet, eat a token */
+      if (yychar == YYEOF) return -1; /* yyparse() ABORT. */
+#if YYDEBUG
+      fprintf(yyparse_fp, "eat token %s\n", yyget_tok(yychar));
+#endif
+      /* discard lookahead, resume parsing. */
+      yychar = -1; /* eat this token and read next symbol. */
+      return 1; 
+    default:
+      YYERR_EXIT("yyerror_handler error: \
+                 yyerrflag > 3 (should be 0~3)\n");
+  } /* end of switch. */
+} /* end of yyerror_handler(). */
+
+
+/*
+ * yyparse - return 0 if succeeds, 1 if anything goes wrong.
+ */
+int yyparse() {
+  YYSTYPE * yypvt;    /* top of value stack for $vars. */
+  int yystate, yyaction = -1, yy_lhs, yy_rhs_ct, yyerr_hdl;
+  yynerrs = yyerrflag = 0;
+
+  yyPTC_count = yy_lrk_cols - 2;
+  yyLRK_Q_init();
+  yy_lrk_pta = LRk_P_T_Array_create(yy_lrk_k - 1);
+  LRk_P_T_Array_read();
+
+#if YYDEBUG
+  if ((yyparse_fp = fopen(yyparse_file, "w")) == NULL) 
+    YYERR_EXIT("yyparse error: cannot open file y.parse\n");
+   
+  HYY_NEW(yypm, int, yystack_capacity);
+  yypm_pt = 0;
+#endif
+
+  HYY_NEW(yyps, int, yystack_capacity);
+  HYY_NEW(yypv, YYSTYPE, yystack_capacity);
+
+  yyps_pt = yypv_pt = 0;
+
+  * (yyps + yyps_pt) = 0; /* push 0 onto the state stack. */
+  if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
+
+  yychar = -1; /* to allow reading the first symbol. */
+
+  while (1) {
+#if YYDEBUG
+    yywrite_stack();
+#endif
+
+    if (yyaction >= 0 && yyfs[yyaction] < 0) {
+      if (yyfs[yyaction] == YY_LRK_CONFLICT) { /* r/r conflict. */
+        /* Note: NO need for LRK_Q_push(yychar) here. */
+        if ((yychar = yylex()) <= 0) yychar = YYEOF;
+        yystate = * (yyps + yyps_pt - 1);
+      }
+      yyaction = yyfs[yyaction]; /* final state default reduce. */
+
+    } else {
+      if (yychar < 0) { /* we want to read next symbol. */
+        if (yyLRK_Q_count > 0) yychar = yyLRK_Q_pop();
+        else yychar = yylex();
+        if (yychar <= 0) yychar = YYEOF; /* end of file. */
+#if YYDEBUG
+        fprintf(yyparse_fp, "- read next symbol: %s\n", yyget_tok(yychar));
+#endif
+      }
+
+      /* update current state: yystate. lookahead is yychar. */
+      yystate = * (yyps + yyps_pt - 1);
+      /* find action in parsing table. */
+      YYGET_ACTION(yystate, yychar, yyaction);
+#if YYDEBUG
+      fprintf(yyparse_fp, "action at (%d, %s) is %d\n", 
+              yystate, yyget_tok(yychar), yyaction);
+#endif
+    } /* end of else */
+
+
+    if (yyaction > 0) { /* is shift */
+      * (yyps + yyps_pt) = yyaction; /* push target state on state stack */
+      if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
+
+      yyval = yylval; /* yylval is obtained from yylex(). */
+      * (yypv + yypv_pt) = yyval; /* push value onto value stack. */
+      yypv_pt ++;
+
+#if YYDEBUG
+      * (yypm + yypm_pt) = yychar;
+      yypm_pt ++;
+      fprintf(yyparse_fp, "- shift: state %d. \n", yyaction);
+#endif
+
+      yychar = -1; /* we want to read next symbol. */
+      if (yyerrflag > 0) yyerrflag --; 
+
+    } else if (yyaction == YYNOACTION) { /* no action found. error */
+      yyerr_hdl = yyerror_handler(yystate); 
+      if (yyerr_hdl == -1) break; /* YYABORT; */
+      else if (yyerr_hdl == 1) continue; /* eat a token. */
+
+    } else if (yyaction < 0) { /* is reduction */
+      if (yyaction == YY_LRK_CONFLICT) {
+        yyaction = yyget_LRK_reduction(yystate, yychar);
+        if (yyaction == 0) { exit(0); } /* error occurred. */
+      }
+
+      yyaction = (-1) * yyaction; /* get reduction number. */
+#if YYDEBUG
+      fprintf(yyparse_fp, "- reduce: by rule %d. ", yyaction);
+#endif
+
+      yy_lhs = yyr1[yyaction]; /* lhs symbol. */
+      yy_rhs_ct = yyr2[yyaction] >> 1; /* number of rhs symbols. */
+
+      yypvt = yypv + yypv_pt - 1; /* top of value stack. */
+      /* default: $$ = $1. $$ then can be changed by rule actions. */
+      yyval = * (yypvt - yy_rhs_ct + 1);
+
+      if ((yyr2[yyaction] & 1) == 1) { /* output associated code. */
+        switch(yyaction) { 
+          $A
+        }
+      } 
+
+      yyps_pt -= yy_rhs_ct; /* pop yy_rhs_ct states from state stack. */
+      yystate = * (yyps + yyps_pt -1); /* get current state. */
+      YYGET_ACTION(yystate, yy_lhs, yyaction); /* get goto state. */
+      if (yyaction == YYNOACTION) {
+        YYERR_EXIT("yyparse symbol table error: goto state not found\n");
+      }
+      * (yyps + yyps_pt) = yyaction; /* push goto state onto stack. */
+      if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
+
+      /* push new value of $$ (yyval) onto value stack. */
+      yypv_pt -= yy_rhs_ct;
+      * (yypv + yypv_pt) = yyval;
+      yypv_pt ++;
+
+#if YYDEBUG
+      yypm_pt -= yy_rhs_ct;
+      * (yypm + yypm_pt) = yy_lhs;
+      yypm_pt ++;
+
+      fprintf(yyparse_fp, "after reduction: goto state=%d, lookahead=%s\n",
+             * (yyps + yyps_pt - 1), yyget_tok(yychar));
+#endif
+
+    } else if (yyaction == 0) { /* is accept */
+      if (yychar == YYEOF) {
+#if YYDEBUG
+        fprintf(yyparse_fp, "- valid accept\n");
+#endif
+        break; /* break out of while loop. */
+      }
+      else { /* this should not happen, since acc happens only on $. */
+        yyerror("yyparse symbol table error: accept not on end marker");
+#if YYDEBUG
+        fprintf(yyparse_fp, "invalid accept. next lookahead is: %s\n",
+                yyget_tok(yychar));
+#endif
+        YYABORT;
+      } 
+    }
+  } /* end of while(1). */
+
+#if YYDEBUG
+  fclose(yyparse_fp);
+  free(yypm);
+#endif
+  free(yyps);
+  free(yypv);
+
+  if (yyerr_hdl == -1) YYABORT;
+  else YYACCEPT;
+} /* end of yyparse */
+
+
+
