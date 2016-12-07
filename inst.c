@@ -46,12 +46,12 @@ void show_manpage() {\n \
   system(\"less ";
 
 static char * s2 = 
-"/hyaccmanpage\");\n\
+"/lib/hyacc/hyaccmanpage\");\n\
 }\n\n\
 char * HYACC_PATH = \n  \
 \"";
 
-static char * s3 = "/hyaccpar\";\n\n";
+static char * s3 = "/lib/hyacc/hyaccpar\";\n\n";
 
 int main(int argc, char ** argv) {
   FILE * fp;

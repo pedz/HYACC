@@ -34,8 +34,8 @@
 #############################################################
 
 # NOTE: choose your installation directory here.
-#INSTALL_PATH = /usr/bin
-INSTALL_PATH = `pwd` # current directory
+INSTALL_PATH = /usr/local
+# INSTALL_PATH = `pwd` # current directory
 
 SRC_HEADER = y.h stack_config.h mrt.h lane_tracing.h
 SRC = y.c get_yacc_grammar.c gen_compiler.c get_options.c \
@@ -89,9 +89,12 @@ install : create_path_file
 	@echo compile ...
 	@make release
 	@echo copy to destination $(INSTALL_PATH) ...
-	@-cp -f ./$(TARGET) $(INSTALL_PATH)/.
-	@-cp -f ./hyaccpar $(INSTALL_PATH)/.
-	@-cp -f ./hyaccmanpage $(INSTALL_PATH)/.
+	@mkdir -p $(INSTALL_PATH)/bin
+	@mkdir -p $(INSTALL_PATH)/lib/hyacc
+	@-cp -f ./$(TARGET) $(INSTALL_PATH)/bin
+	@-cp -f ./hyaccpar $(INSTALL_PATH)/lib/hyacc
+	@-cp -f ./hyaccpark $(INSTALL_PATH)/lib/hyacc
+	@-cp -f ./hyaccmanpage $(INSTALL_PATH)/lib/hyacc
 	@echo installation succesfully finishes
 
 create_path_file: inst.c
@@ -102,9 +105,10 @@ create_path_file: inst.c
 
 uninstall:
 	@echo to uninstall, manually remove the following files:
-	@echo $(INSTALL_PATH)/$(TARGET)
-	@echo $(INSTALL_PATH)/hyaccpar
-	@echo $(INSTALL_PATH)/hyaccmanpage
+	@echo $(INSTALL_PATH)/bin/$(TARGET)
+	@echo $(INSTALL_PATH)/lib/hyacc/hyaccpar
+	@echo $(INSTALL_PATH)/lib/hyacc/hyaccpark
+	@echo $(INSTALL_PATH)/lib/hyacc/hyaccmanpage
 
 dist:
 	@-rm -f $(PACK_NAME).gz
