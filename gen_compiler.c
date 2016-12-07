@@ -56,7 +56,7 @@ static void prepare_outfile() {
 }
 
 
-static void my_perror(char * msg, char c) {
+static void my_perror(char * msg, int c) {
   printf("\nerror [line %d, col %d]: invalid char '%c'. %s\n",
          n_line, n_col, c, msg);
   exit(1);
@@ -106,7 +106,7 @@ void writeTokensToCompilerFile() {
  *  y.tab.c, and write token declarations too.
  */
 void processYaccFile_section1() {
-  char c, last_c = '\n', last_last_c;
+  int c, last_c = '\n', last_last_c;
   BOOL IS_CODE = FALSE;
 
   n_line = n_col = 1;
@@ -143,7 +143,7 @@ void processYaccFile_section1() {
  * rewind to section 2.
  */
 static void goto_section2() {
-  char c, last_c = 0, last_last_c = '\n';
+  int c, last_c = 0, last_last_c = '\n';
 
   fseek(fp_yacc, 0L, 0); // go to the beginning of file fp.
   n_line = 1;
@@ -163,7 +163,7 @@ static void goto_section2() {
  * Presumption: finished section 1, entering section 2.
  */
 static void goto_section3() {
-  char c, last_c = 0, last_last_c = '\n';
+  int c, last_c = 0, last_last_c = '\n';
 
   while ((c = getc(fp_yacc)) != EOF) {
     if (c == '\n') n_line ++;
@@ -178,7 +178,7 @@ static void goto_section3() {
 
 /*
  * Basically, this has the same structure as function
- *   processYaccFileInput_section2(char c)
+ *   processYaccFileInput_section2(int c)
  * in parsetYaccInput.c.
  *
  * The purpose here is to extract the code for semantic 
@@ -190,7 +190,7 @@ static void processYaccFile_section2(char * filename) {
   BOOL READING_SYMBOL = FALSE;
   BOOL READING_NUMBER = FALSE;
   int dollar_number = 0;
-  char c, last_c = 0, last_last_c = 0;
+  int c, last_c = 0, last_last_c = 0;
   int rule_count = 0;
   BOOL END_OF_CODE = FALSE; // for mid-production action.
   static char * padding = "        ";
@@ -378,7 +378,7 @@ static void processYaccFile_section2(char * filename) {
 
 
 void processYaccFile_section3() {
-  char c;
+  int c;
   while((c = getc(fp_yacc)) != EOF) {
     putc(c, fp);
   }
@@ -389,7 +389,7 @@ void processYaccFile_section3() {
  * Copy code from resource files into output file.
  */
 void copy_src_file(char * filename) {
-  char c;
+  int c;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
     printf("error: can't open file %s\n", filename);
@@ -407,7 +407,7 @@ void copy_src_file(char * filename) {
  * associated with reductions.
  */
 void copy_yaccpar_file_1(char * filename) {
-  char c, last_c = 0;
+  int c, last_c = 0;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
     printf("error: can't open file %s\n", filename);
@@ -425,7 +425,7 @@ void copy_yaccpar_file_1(char * filename) {
 
 
 void copy_yaccpar_file_2(char * filename) {
-  char c, last_c = 0;
+  int c, last_c = 0;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
     printf("error: can't open file %s\n", filename);

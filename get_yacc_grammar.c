@@ -289,7 +289,7 @@ void get_expect_sr_conflict() {
  * Note: At this time, don't worry about whether the first
  * char of a symbol should be a letter.
  */
-void addCharToSymbol(char c) {
+void addCharToSymbol(int c) {
   if (ysymbol_pt >= ysymbol_size - 1) { // one more for '\0'.
     ysymbol_size *= 2;
 
@@ -344,7 +344,7 @@ yacc_section1_state get_section1_state() {
 }
 
 
-static void my_perror(char * msg, char c) {
+static void my_perror(char * msg, int c) {
   printf("\nerror [line %d, col %d]: invalid char '%c'. %s\n",
          n_line, n_col, c, msg);
   exit(0);
@@ -358,7 +358,7 @@ static void my_perror(char * msg, char c) {
  * Currently this only gets the "%start" line if there is one.
  */
 void processYaccFileInput_section1() {
-  char c, last_c = '\n', last_last_c;
+  int c, last_c = '\n', last_last_c;
   yacc_section1_state state = IS_NONE, prev_state = -1;
 
   ysymbol_pt = 0;
@@ -851,7 +851,7 @@ void getTerminals(Grammar * g) {
 /*
  * ref: page 38. The C programming language.
  */
-char get_escape_char(char c) {
+char get_escape_char(int c) {
   switch (c) {
     case 'a': return '\a'; break;
     case 'b': return '\b'; break;
@@ -1172,7 +1172,7 @@ void processYaccFileInput_section2() {
   int mid_prod_code_ct = 0;
   BOOL END_OF_CODE = FALSE;
 
-  char c, last_c = 0;
+  int c, last_c = 0;
   yacc_sec2_state = LHS;
   ysymbol_pt = 0;
 
