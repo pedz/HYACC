@@ -85,6 +85,9 @@ clean :
 	rm -f ./$(TARGET) ./$(OBJS)
 	@echo target is cleaned
 
+cscope.out : $(SRC)
+	cscope -q -b $(SRC)
+
 install : create_path_file
 	@echo compile ...
 	@make release
