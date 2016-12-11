@@ -40,6 +40,13 @@ static FILE * fp_h; // for y.tab.h
 static int n_line; // count number of lines in yacc input file.
 static int n_col;
 
+char *yystype_definition = "typedef int YYSTYPE;";
+static char *yystype_format =
+  "#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED\n"
+  "%s\n"
+  "#define YYSTYPE_IS_DECLARED 1\n"
+  "#endif\n"
+  ;
 
 static void prepare_outfile() {
   if ((fp = fopen(y_tab_c, "w")) == NULL) {
@@ -84,7 +91,7 @@ void writeTokens() {
 void writeTokensToCompilerFile() {
   int i, index = 0;
   SymbolNode * a;
-
+  
   fprintf(fp, "\n/* tokens */\n\n");
   if (USE_HEADER_FILE) fprintf(fp_h, "\n/* tokens */\n\n");
 
@@ -98,6 +105,10 @@ void writeTokensToCompilerFile() {
 
     index ++;
   }
+
+  fprintf(fp, yystype_format, yystype_definition);
+  if (USE_HEADER_FILE)
+    fprintf(fp_h, yystype_format, yystype_definition);
 }
 
 
@@ -1022,5 +1033,3 @@ void generate_compiler(char * infile) {
   fclose(fp_yacc);
 
 }
-
-

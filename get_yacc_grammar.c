@@ -375,6 +375,8 @@ static void my_perror(char * msg, int c) {
 void processYaccFileInput_section1() {
   int c, last_c = '\n', last_last_c;
   yacc_section1_state state = IS_NONE, prev_state = -1;
+  int union_depth = 0;
+  off_t union_start;
 
   ysymbol_pt = 0;
   tokens = tokens_tail = NULL;
@@ -507,9 +509,27 @@ void processYaccFileInput_section1() {
 
     } else if (state == IS_UNION) {
       if (c == '{') { // union starts.
-
+	if (union_depth++ == 0)
+	  union_start = ftello(fp) - 1; /* to include the { */
       } else if (c == '}') { // union ends.
-        state = IS_NONE;
+	if (--union_depth == 0) {
+	  static char str1[] = "typedef union YYSTYPE\n";
+	  static char str2[] = "\n        YYSTYPE;";
+	  off_t size = ftello(fp) - union_start;
+	  off_t malloc_size = size + sizeof(str1) + sizeof(str2) - 1;
+	  extern char *yystype_definition;
+
+	  if (!(yystype_definition = malloc(malloc_size))) {
+	    printf("out of memory\n");
+	    exit(1);
+	  }
+	  strcpy(yystype_definition, str1);
+	  fseeko(fp, union_start, SEEK_SET);
+	  fread(yystype_definition + sizeof(str1) - 1, size, 1, fp);
+	  strcpy(yystype_definition + sizeof(str1) - 1 + size, str2);
+	  yystype_definition[malloc_size] = '\0';
+	  state = IS_NONE;
+	}
       } else { // get union content.
 
       }

@@ -38,10 +38,6 @@
 
 #define YYLEX() yylex()
 
-#ifndef YYSTYPE
-#define YYSTYPE int
-#endif
-
 #define YYNOACTION -10000000 
 #define YYEOF     0   /* for strEnd, input end marker. */
 #define YYERRCODE 256 /* for use by "error" token. */
