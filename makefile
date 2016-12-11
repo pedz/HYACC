@@ -85,8 +85,8 @@ clean :
 	rm -f ./$(TARGET) ./$(OBJS)
 	@echo target is cleaned
 
-cscope.out : $(SRC)
-	cscope -q -b $(SRC)
+cscope.out : $(SRC) hyaccpar hyaccpark
+	cscope -q -b $(SRC) hyaccpar hyaccpark
 
 install : create_path_file
 	@echo compile ...
