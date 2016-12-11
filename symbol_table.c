@@ -392,7 +392,7 @@ void hashTbl_init() {
   }
 
 #if DEBUG_HASHTBL
-    printf("size of hash table = %d\n", sizeof(HashTbl));
+    printf("size of hash table = %ld\n", sizeof(HashTbl));
 #endif
   //testHashTbl();
 }
@@ -433,6 +433,9 @@ SymbolTblNode * hashTbl_insert(char * symbol) {
   SymbolTblNode * n;
 
   if (symbol == NULL) return NULL;
+#if DEBUG_HASHTBL
+  printf("hash insert %s at %d\n", symbol, where);
+#endif
   v = hash_value(symbol);
 
   if (HashTbl[v].next == NULL) {
@@ -476,7 +479,7 @@ SymbolTblNode * hashTbl_find(char * symbol) {
   for (n = HashTbl[v].next; n != NULL; n = n->next) {
     if (strcmp(n->symbol, symbol) == 0) {
 #if DEBUG_HASHTBL
-      printf("node for %s is found\n");
+      printf("node for %s is found\n", symbol);
 #endif
       return n;
     }
