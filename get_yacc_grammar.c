@@ -189,6 +189,8 @@ void addToken(SymbolTblNode * n) {
 void output_terminal(yacc_section1_state state,
                      yacc_section1_state prev_state) {
   SymbolTblNode * n;
+  int add_token;
+
   if (ysymbol_pt == 0) {
     if (state == IS_QUOTED_TERMINAL) {
       printf("error [line %d, col %d]: empty token is not allowed\n",
@@ -202,7 +204,20 @@ void output_terminal(yacc_section1_state state,
   n = hashTbl_insert(ysymbol);
   ysymbol_pt = 0;
 
-  n->type = _TERMINAL;
+  switch (n->type) {
+  case _TERMINAL:
+    add_token = 0;
+    break;
+    
+  case _NEITHER:
+    n->type = _TERMINAL;
+    add_token = 1;
+    break;
+    
+  default:
+    printf("error %s used a terminal", n->symbol);
+    exit(1);
+  }
 
   // get property of this terminal.
   // Quote informatin is used to decide to print it to y.tab.h.
@@ -224,7 +239,7 @@ void output_terminal(yacc_section1_state state,
     get_terminal_precedence(n, state);
   }
 
-  addToken(n);
+  if (add_token) addToken(n);
 }
 
 
