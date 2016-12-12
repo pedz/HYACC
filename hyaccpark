@@ -84,7 +84,8 @@ YYSTYPE yyval;  /* "$$" used in production action. */
 
 
 /* get token name from value of yychar. */
-char * yyget_tok(const int yychar) {
+char * yyget_tok(const int yychar)
+{
   static char c[1];
   int i;
   if (yychar == YYEOF) return "EOF";
@@ -103,7 +104,8 @@ char * yyget_tok(const int yychar) {
 
 #if YYDEBUG
 
-void yywrite_stack() { 
+void yywrite_stack()
+{ 
   int i; 
   /* It's unknown what data type yypv is, so can't write here. */ 
   /* The user can customize the code here himself. */ 
@@ -216,7 +218,8 @@ static int yyLRK_Q_t; /* tail pointer */
 static int yyLRK_Q_count; /* count */
 static int yyLRK_Q_size;  /* size  */
 
-static void yyLRK_Q_init() {
+static void yyLRK_Q_init()
+{
   yyLRK_Q_h = 0;
   yyLRK_Q_t = 0;
   yyLRK_Q_count = 0;
@@ -224,7 +227,8 @@ static void yyLRK_Q_init() {
   if ((yyLRK_Q = (int *) malloc((yyLRK_Q_size) * sizeof(int))) == NULL)
     YYERR_EXIT("yyparse error: out of memory\n");
 }
-static void yyLRK_Q_EXPAND() {
+static void yyLRK_Q_EXPAND()
+{
   int i, pt, * tmp;
   if ((tmp = (int *) malloc((yyLRK_Q_size * 2) * sizeof(int))) == NULL)
     YYERR_EXIT("yyparse error: out of memory\n");
@@ -239,7 +243,8 @@ static void yyLRK_Q_EXPAND() {
   free(yyLRK_Q);
   yyLRK_Q = tmp;
 }
-static void yyLRK_Q_push(int yychar) {
+static void yyLRK_Q_push(int yychar)
+{
   if (yyLRK_Q_count == yyLRK_Q_size) { yyLRK_Q_EXPAND(); }
 
   yyLRK_Q[yyLRK_Q_t ++] = yychar;
@@ -250,7 +255,8 @@ static void yyLRK_Q_push(int yychar) {
  * To avoid underflow, call like this:
  *   if (LRK_Q_count > 0) item = LRK_Q_pop();
  */
-static int yyLRK_Q_pop() {
+static int yyLRK_Q_pop()
+{
   int item;
   item = yyLRK_Q[yyLRK_Q_h ++];
   if (yyLRK_Q_h == yyLRK_Q_size) yyLRK_Q_h = 0;
@@ -262,7 +268,8 @@ static int yyLRK_Q_pop() {
 /*
  * return the index of symbol (whose ID is e) in yyPTC.
  */
-static int yyget_col(int e) {
+static int yyget_col(int e)
+{
   int i, len;
   len = yy_lrk_cols - 2;
   for (i = 0; i < len; i ++) {
@@ -276,7 +283,8 @@ static int yyget_col(int e) {
 // Functions for LR(k) table. START. 
 //////////////////////////////////////////////////////////////////
 
-static LRk_P_T * LRk_P_T_create(int k) {
+static LRk_P_T * LRk_P_T_create(int k)
+{
   LRk_P_T * t;
   HYY_NEW(t, LRk_P_T, 1);
   t->k = k;
@@ -286,7 +294,8 @@ static LRk_P_T * LRk_P_T_create(int k) {
 }
 
 
-static void LRk_P_T_dump(LRk_P_T * t) {
+static void LRk_P_T_dump(LRk_P_T * t)
+{
   LRk_P_T_row * r;
   int n, i, red;
 
@@ -318,7 +327,8 @@ static void LRk_P_T_dump(LRk_P_T * t) {
  *          otherwise, return the row before the insertion point.
  */
 static LRk_P_T_row * LRk_P_T_find(LRk_P_T * t,
-    int state, int token, int * found) {
+    int state, int token, int * found)
+{
   LRk_P_T_row * r, * r_prev;
   int cmp;
   
@@ -352,7 +362,8 @@ static LRk_P_T_row * LRk_P_T_find(LRk_P_T * t,
  * @Return: the inserted new row.
  */
 static LRk_P_T_row * LRk_P_T_addRow(LRk_P_T * t, LRk_P_T_row * r_prev,
-    int state, int token) {
+    int state, int token)
+{
   LRk_P_T_row * r;
   int i;
   
@@ -382,7 +393,8 @@ static LRk_P_T_row * LRk_P_T_addRow(LRk_P_T * t, LRk_P_T_row * r_prev,
  * Assumptions: t != NULL.
  */
 static int LRk_P_T_getEntry(LRk_P_T * t, int state,
-    int token, int col_token, int * exist) {
+			    int token, int col_token, int * exist)
+{
   int index, found;
   LRk_P_T_row * r;
   
@@ -403,7 +415,8 @@ static int LRk_P_T_getEntry(LRk_P_T * t, int state,
 // Functions for LR(k) table array. START.
 //////////////////////////////////////////////////////////////////
 
-static LRk_P_T_Array * LRk_P_T_Array_create(int size) {
+static LRk_P_T_Array * LRk_P_T_Array_create(int size)
+{
   LRk_P_T_Array * a;
   int i;
   HYY_NEW(a, LRk_P_T_Array, 1);
@@ -420,7 +433,8 @@ static LRk_P_T_Array * LRk_P_T_Array_create(int size) {
 /*
  * Add t to a.
  */
-static void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t) {
+static void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t)
+{
   if (NULL == a || NULL == t) return;
   
   /* 0 <= max_k - 2 <= size - 1 ==> max_k <= size + 1 */
@@ -440,7 +454,8 @@ static void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t) {
 }
 
 
-static void yyWriteParsingTblColHdr() {
+static void yyWriteParsingTblColHdr()
+{
   int i;
   printf("--Parsing Table Column Header [Total: %d]--\n", yy_lrk_cols - 2);
   for (i = 0; i < yyPTC_count; i ++) {
@@ -456,7 +471,8 @@ static void yyWriteParsingTblColHdr() {
 }
 
 
-static void LRk_P_T_Array_dump(LRk_P_T_Array * a) {
+static void LRk_P_T_Array_dump(LRk_P_T_Array * a)
+{
   LRk_P_T * t;
   int i;
   if (NULL == a) return;
@@ -474,7 +490,8 @@ static void LRk_P_T_Array_dump(LRk_P_T_Array * a) {
 /*
  * read the LRk_P_T array tables into the LR(k) parsing table.
  */
-static void LRk_P_T_Array_read() {
+static void LRk_P_T_Array_read()
+{
   LRk_P_T * t;
   LRk_P_T_row * r;
   int state, token, k, rows, row, col, offset, next_index, next_ruleID;
@@ -528,7 +545,8 @@ static void LRk_P_T_Array_read() {
  * return: (-1) * ruleID, if the corresponding reduction is found. 
  *         0 - error.
  */ 
-static int yyget_LRK_reduction(int yystate, int token) {
+static int yyget_LRK_reduction(int yystate, int token)
+{
   int k, yychar, exist, entry;
 #if YYDEBUG_LRK
   printf("yyget_LRK_reduction(%d, %d/%s)\n", \
@@ -576,7 +594,8 @@ static int yyget_LRK_reduction(int yystate, int token) {
  * state: yystate. lookahead: yychar.
  * return: 0 if success, -1 if fail, 1 if eat a token.
  */
-static int yyerror_handler(int yystate) {
+static int yyerror_handler(int yystate)
+{
   int yyaction;
   switch (yyerrflag) {
     case 0:
@@ -650,7 +669,8 @@ static int yyerror_handler(int yystate) {
 /*
  * yyparse - return 0 if succeeds, 1 if anything goes wrong.
  */
-int yyparse() {
+int yyparse()
+{
   YYSTYPE * yypvt;    /* top of value stack for $vars. */
   int yystate, yyaction = -1, yy_lhs, yy_rhs_ct, yyerr_hdl;
   yynerrs = yyerrflag = 0;
@@ -809,6 +829,3 @@ int yyparse() {
   if (yyerr_hdl == -1) YYABORT;
   else YYACCEPT;
 } /* end of yyparse */
-
-
-

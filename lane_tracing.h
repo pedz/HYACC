@@ -304,5 +304,3 @@ extern Configuration * cur_red_config;
 extern SymbolList EDGE_PUSHING_CONTEXT_GENERATED;
 
 #endif
-
-

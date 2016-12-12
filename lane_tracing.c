@@ -108,7 +108,8 @@ LT_tbl_entry * LT_tbl_findEntry(int from_state);
 BOOL cluster_trace_new_chain_all(int parent_state, LT_tbl_entry * e);
 
 
-void dump_llist_context_set(llist_context_set * contxt_set) {
+void dump_llist_context_set(llist_context_set * contxt_set)
+{
   llist_context_set * c = contxt_set;
   SymbolNode * n;
   if (c == NULL) return;
@@ -125,12 +126,12 @@ void dump_llist_context_set(llist_context_set * contxt_set) {
   }
 }
 
-
 /*
  * Assumption: contxt_set is in INC order.
  */
 llist_context_set * llist_context_set_create(
-    Configuration * config) { //, SymbolList contxt_set) {
+    Configuration * config) //, SymbolList contxt_set)
+{
   llist_context_set * s;
   HYY_NEW(s, llist_context_set, 1);
 
@@ -141,7 +142,8 @@ llist_context_set * llist_context_set_create(
 }
 
 
-void llist_context_set_destroy(llist_context_set * s) {
+void llist_context_set_destroy(llist_context_set * s)
+{
   freeSymbolNodeList(s->ctxt);
   free(s);
 }
@@ -151,7 +153,8 @@ void llist_context_set_destroy(llist_context_set * s) {
  * Add (merge) contxt_set to c->ctxt.
  */
 void llist_context_set_addContext(
-    llist_context_set * c, SymbolList contxt_set) {
+    llist_context_set * c, SymbolList contxt_set)
+{
   SymbolNode * n;
   int exist;
 
@@ -167,7 +170,8 @@ void llist_context_set_addContext(
 /*
  * Return a clone of c.
  */
-llist_context_set * llist_context_set_clone(llist_context_set * c) {
+llist_context_set * llist_context_set_clone(llist_context_set * c)
+{
   llist_context_set * d, * d_next, * c_next;
 
   if (NULL == c) return NULL;
@@ -190,7 +194,8 @@ llist_context_set * llist_context_set_clone(llist_context_set * c) {
 // llist_int functions. START.
 
 
-llist_int * llist_int_create(int n) {
+llist_int * llist_int_create(int n)
+{
   llist_int * item;
   HYY_NEW(item, llist_int, 1);
   item->n = n;
@@ -199,7 +204,8 @@ llist_int * llist_int_create(int n) {
 }
 
 
-void llist_int_destroy(llist_int * list) {
+void llist_int_destroy(llist_int * list)
+{
   llist_int * tmp;
   while (list != NULL) {
     tmp = list;
@@ -212,7 +218,8 @@ void llist_int_destroy(llist_int * list) {
 /*
  * Add n to the list in INC order.
  */
-llist_int * llist_int_add_inc(llist_int * list, int n) {
+llist_int * llist_int_add_inc(llist_int * list, int n)
+{
   llist_int * t, * t_prev;
   int cmp;
 
@@ -245,7 +252,8 @@ llist_int * llist_int_add_inc(llist_int * list, int n) {
  * Add n to the head of list.
  * Return: pointer to the head of the list.
  */
-llist_int * llist_int_add_head(llist_int * list, int n) {
+llist_int * llist_int_add_head(llist_int * list, int n)
+{
   llist_int * t;
   t = llist_int_create(n);
   t->next = list;
@@ -253,7 +261,8 @@ llist_int * llist_int_add_head(llist_int * list, int n) {
 }
 
 
-void llist_int_dump(llist_int * list) {
+void llist_int_dump(llist_int * list)
+{
   llist_int * x;
   if (list == NULL) return;
 
@@ -267,7 +276,8 @@ void llist_int_dump(llist_int * list) {
 
 // llist_int2 functions. START.
 
-llist_int2 * llist_int2_create(int n1, int n2) {
+llist_int2 * llist_int2_create(int n1, int n2)
+{
   llist_int2 * item;
   HYY_NEW(item, llist_int2, 1);
   item->n1 = n1;
@@ -277,7 +287,8 @@ llist_int2 * llist_int2_create(int n1, int n2) {
 }
 
 
-void llist_int2_destroy(llist_int2 * list) {
+void llist_int2_destroy(llist_int2 * list)
+{
   llist_int2 * tmp;
   while (list != NULL) {
     tmp = list;
@@ -290,7 +301,8 @@ void llist_int2_destroy(llist_int2 * list) {
 /*
  * Add n1, n2 to the list in INC order of n1.
  */
-llist_int2 * llist_int2_add_inc(llist_int2 * list, int n1, int n2) {
+llist_int2 * llist_int2_add_inc(llist_int2 * list, int n1, int n2)
+{
   llist_int2 * t, * t_prev;
   int cmp;
 
@@ -323,7 +335,8 @@ llist_int2 * llist_int2_add_inc(llist_int2 * list, int n1, int n2) {
  * Add n to the head of list.
  * Return: pointer to teh head of the list.
  */
-llist_int2 * llist_int2_add_head(llist_int2 * list, int n1, int n2) {
+llist_int2 * llist_int2_add_head(llist_int2 * list, int n1, int n2)
+{
   llist_int2 * t;
   t = llist_int2_create(n1, n2);
   t->next = list;
@@ -334,7 +347,8 @@ llist_int2 * llist_int2_add_head(llist_int2 * list, int n1, int n2) {
 /*
  * Find the node in a llist_int list whose first entry is n1.
  */
-llist_int2 * llist_int2_find_n1(llist_int2 * list, int n1) {
+llist_int2 * llist_int2_find_n1(llist_int2 * list, int n1)
+{
   llist_int2 * t;
   for (t = list; t != NULL; t = t->next) {
     if (t->n1 == n1) return t;
@@ -346,7 +360,8 @@ llist_int2 * llist_int2_find_n1(llist_int2 * list, int n1) {
 /*
  * Find the node in a llist_int list whose first entry is n2.
  */
-llist_int2 * llist_int2_find_n2(llist_int2 * list, int n2) {
+llist_int2 * llist_int2_find_n2(llist_int2 * list, int n2)
+{
   llist_int2 * t;
   for (t = list; t != NULL; t = t->next) {
     if (t->n2 == n2) return t;
@@ -355,7 +370,8 @@ llist_int2 * llist_int2_find_n2(llist_int2 * list, int n2) {
 }
 
 
-void llist_int2_dump(llist_int2 * list) {
+void llist_int2_dump(llist_int2 * list)
+{
   llist_int2 * x;
   if (list == NULL) return;
 
@@ -367,7 +383,8 @@ void llist_int2_dump(llist_int2 * list) {
 // llist_int2 functions, END.
 
 
-LT_tbl_entry * LT_tbl_entry_create(State * from, State * to) {
+LT_tbl_entry * LT_tbl_entry_create(State * from, State * to)
+{
   LT_tbl_entry * e;
   HYY_NEW(e, LT_tbl_entry, 1);
   e->from_state = from->state_no;
@@ -390,7 +407,8 @@ LT_tbl_entry * LT_tbl_entry_create(State * from, State * to) {
  * A LT_tbl_entry can have more than one to_state.
  * add to_state in increasing order of the state_no.
  */
-void LT_tbl_entry_addToState(LT_tbl_entry * e, State * to) {
+void LT_tbl_entry_addToState(LT_tbl_entry * e, State * to)
+{
   if (to == NULL || e == NULL) return;
   e->to_states = llist_int_add_inc(e->to_states, to->state_no);
 }
@@ -400,7 +418,8 @@ void LT_tbl_entry_addToState(LT_tbl_entry * e, State * to) {
  * Add an entry (from_state, to_state) to the LT_tbl, 
  * don't add the (config, context) information here.
  */
-static void LT_tbl_entry_add(State * from, State * to) {
+static void LT_tbl_entry_add(State * from, State * to)
+{
   LT_tbl_entry * e, * e_prev;
   if (LT_tbl == NULL) {
     LT_tbl = LT_tbl_entry_create(from, to);
@@ -434,7 +453,8 @@ static void LT_tbl_entry_add(State * from, State * to) {
  * Find from state in the LT_tbl. 
  * If not found, insert it.
  */
-LT_tbl_entry * LT_tbl_entry_find_insert(State * from) {
+LT_tbl_entry * LT_tbl_entry_find_insert(State * from)
+{
   LT_tbl_entry * e, * e_prev;
   if (NULL == LT_tbl) { //insert as the first
     LT_tbl = LT_tbl_entry_create(from, NULL);
@@ -469,7 +489,8 @@ LT_tbl_entry * LT_tbl_entry_find_insert(State * from) {
  *
  * There can be at most one entry found.
  */
-LT_tbl_entry * LT_tbl_entry_find(State * from) {
+LT_tbl_entry * LT_tbl_entry_find(State * from)
+{
   LT_tbl_entry * e, * e_prev;
   if (NULL == LT_tbl) { //insert as the first
     LT_tbl = LT_tbl_entry_create(from, NULL);
@@ -500,7 +521,8 @@ LT_tbl_entry * LT_tbl_entry_find(State * from) {
  * Find the cur_red_config in the LT_tbl_entry e.
  * If not found, then insert it.
  */
-static llist_context_set * llist_context_set_get(LT_tbl_entry * e) {
+static llist_context_set * llist_context_set_get(LT_tbl_entry * e)
+{
   llist_context_set * c, * c_prev;
   if (NULL == e) {
     printf("llist_context_set_get error: e is NULL\n");
@@ -547,7 +569,8 @@ static llist_context_set * llist_context_set_get(LT_tbl_entry * e) {
  *
  * The current config is "cur_red_config" defined at the top.
  */
-static void LT_tbl_entry_addContext(State * from, SymbolList ctxt) {
+static void LT_tbl_entry_addContext(State * from, SymbolList ctxt)
+{
   LT_tbl_entry * e;
   llist_context_set * c;
 
@@ -569,7 +592,8 @@ static void LT_tbl_entry_addContext(State * from, SymbolList ctxt) {
 }
 
 
-static void dump_LT_tbl_entry(LT_tbl_entry * e) {
+static void dump_LT_tbl_entry(LT_tbl_entry * e)
+{
   if (NULL == e) return;
 
   printf("%d \t| ", e->from_state);
@@ -581,7 +605,8 @@ static void dump_LT_tbl_entry(LT_tbl_entry * e) {
 }
 
 
-void dump_LT_tbl() {
+void dump_LT_tbl()
+{
   LT_tbl_entry * e;
   if (LT_tbl == NULL) return;
   
@@ -604,7 +629,8 @@ void dump_LT_tbl() {
  * Similar to the function hasEmptyIntersection() in y.c.
  * This can be put into symbol_table.c.
  */
-static BOOL symbolList_disjoint(SymbolList a, SymbolList b) {
+static BOOL symbolList_disjoint(SymbolList a, SymbolList b)
+{
   while (a != NULL && b != NULL) {
     if (a->snode == b->snode) return FALSE;
     if (strcmp(a->snode->symbol, b->snode->symbol) < 0) {
@@ -619,7 +645,8 @@ static BOOL symbolList_disjoint(SymbolList a, SymbolList b) {
 /*
  * Check the given context sets are pair_wise disjoint.
  */
-static BOOL pairwise_disjoint(llist_context_set * ctxt_set) {
+static BOOL pairwise_disjoint(llist_context_set * ctxt_set)
+{
   llist_context_set * a, * b;
 
   // if ctxt_set contains less than 2 nodes, return TRUE.
@@ -643,7 +670,8 @@ static BOOL pairwise_disjoint(llist_context_set * ctxt_set) {
  *
  * By default, the states element's n1 and n2 are the same.
  */
-static LT_cluster * cluster_create(LT_tbl_entry * e) {
+static LT_cluster * cluster_create(LT_tbl_entry * e)
+{
   LT_cluster * c;
   HYY_NEW(c, LT_cluster, 1);
   
@@ -662,14 +690,16 @@ static LT_cluster * cluster_create(LT_tbl_entry * e) {
 /*
  * Not really neccesssary, but can be used to save running time space.
  */
-static void cluster_destroy(LT_cluster * c) {
+static void cluster_destroy(LT_cluster * c)
+{
   llist_int2_destroy(c->states);
   llist_context_set_destroy(c->ctxt_set);
   free(c);
 }
 
 
-void cluster_dump(LT_cluster * c) {
+void cluster_dump(LT_cluster * c)
+{
   llist_int2 * n, * m;
   llist_int * s;
   LT_tbl_entry * e;
@@ -695,7 +725,8 @@ void cluster_dump(LT_cluster * c) {
 }
 
 
-static void all_clusters_dump() {
+static void all_clusters_dump()
+{
   LT_cluster * c;
   puts("--all_clusters.START--");
   for (c = all_clusters; c != NULL; c = c->next) {
@@ -714,7 +745,8 @@ static void all_clusters_dump() {
  * splitted from. So there could be more than one cluster
  * contain it.
  */
-int cluster_contain_state(LT_cluster * c, int state_no) {
+int cluster_contain_state(LT_cluster * c, int state_no)
+{
   llist_int2 * s;
 
   if (state_no < 0) return -1;
@@ -741,7 +773,8 @@ int cluster_contain_state(LT_cluster * c, int state_no) {
  * Note state_no here is the actual state_no.
  * There could be only one cluster contains it.
  */
-int cluster_contain_actual_state(LT_cluster * c, int state_no) {
+int cluster_contain_actual_state(LT_cluster * c, int state_no)
+{
   llist_int2 * s;
 
   if (state_no < 0) return -1;
@@ -768,7 +801,8 @@ int cluster_contain_actual_state(LT_cluster * c, int state_no) {
  *     combine the context.
  */
 llist_context_set * llist_context_set_mergeChain(
-    llist_context_set * dst, llist_context_set * src) {
+    llist_context_set * dst, llist_context_set * src)
+{
   llist_context_set * a, * a_prev, * b;
   int cmp;
 
@@ -813,7 +847,8 @@ llist_context_set * llist_context_set_mergeChain(
 }
 
 
-OriginatorList * cloneOriginatorList(OriginatorList * o) {
+OriginatorList * cloneOriginatorList(OriginatorList * o)
+{
   int i, ct;
   OriginatorList * s;
   HYY_NEW(s, OriginatorList, 1);
@@ -829,7 +864,8 @@ OriginatorList * cloneOriginatorList(OriginatorList * o) {
 }
 
 
-void copyConfig_LALR(Configuration * dst, Configuration * src) {
+void copyConfig_LALR(Configuration * dst, Configuration * src)
+{
   if (dst == NULL || src == NULL) return;
 
   dst->ruleID = src->ruleID;
@@ -850,7 +886,8 @@ void copyConfig_LALR(Configuration * dst, Configuration * src) {
 }
 
 
-State * cloneState(State * s) {
+State * cloneState(State * s)
+{
   int i, ct;
   State * t; // clone
 
@@ -893,7 +930,8 @@ State * cloneState(State * s) {
  * In the successor list of src_state, replace s_old with s_new.
  */
 void replaceSuccessor(State * src_state, 
-                      State * s_new, State * s_old) {
+                      State * s_new, State * s_old)
+{
   int i, ct;
   if (s_new == s_old) return;
 
@@ -942,7 +980,8 @@ void replaceSuccessor(State * src_state,
  * }
  */
 static void lane_head_tail_pairs_replace(LT_cluster * c,
-    Configuration * end_config, State * s, State * s_copy) {
+    Configuration * end_config, State * s, State * s_copy)
+{
   ConfigPairNode * n;
   int i;
   if (end_config->owner != s) return;
@@ -979,7 +1018,8 @@ static void lane_head_tail_pairs_replace(LT_cluster * c,
  */
 int cluster_add_LT_tbl_entry(LT_cluster * c, int from_state,
     llist_context_set * e_ctxt,
-    int e_parent_state_no, BOOL copy) {
+    int e_parent_state_no, BOOL copy)
+{
   State * s_parent, * s, * s_copy;
   int state_no = from_state;
 
@@ -1032,7 +1072,8 @@ int cluster_add_LT_tbl_entry(LT_cluster * c, int from_state,
  *     ...
  *   }
  */
-LT_cluster * find_containing_cluster(LT_cluster * c, int state_no) {
+LT_cluster * find_containing_cluster(LT_cluster * c, int state_no)
+{
   c = (NULL == c) ? all_clusters : c->next;
 
 #if DEBUG_PHASE_2_REGENERATE2
@@ -1055,7 +1096,8 @@ LT_cluster * find_containing_cluster(LT_cluster * c, int state_no) {
  * Find the cluster than contains the ACTUAL state_no.
  * There can be at most one such cluster.
  */
-LT_cluster * find_actual_containing_cluster(int state_no) {
+LT_cluster * find_actual_containing_cluster(int state_no)
+{
   LT_cluster * c;
 
   for (c = all_clusters; c != NULL; c = c->next) {
@@ -1072,7 +1114,8 @@ LT_cluster * find_actual_containing_cluster(int state_no) {
  *
  * Note that in LT_tbl, the entries are in INC order of state_no.
  */
-LT_tbl_entry * LT_tbl_findEntry(int from_state) {
+LT_tbl_entry * LT_tbl_findEntry(int from_state)
+{
   LT_tbl_entry * e;
   int cmp;
 
@@ -1091,7 +1134,8 @@ LT_tbl_entry * LT_tbl_findEntry(int from_state) {
  *
  * Add each state in new_part to old_part, also merge context sets.
  */
-void combine_cluster(LT_cluster * c_new, LT_cluster * c_old) {
+void combine_cluster(LT_cluster * c_new, LT_cluster * c_old)
+{
   llist_int2 * a;
   // merge states.
   for (a = c_new->states; a != NULL; a = a->next) {
@@ -1101,7 +1145,6 @@ void combine_cluster(LT_cluster * c_new, LT_cluster * c_old) {
   c_old->ctxt_set = llist_context_set_mergeChain(
     c_old->ctxt_set, c_new->ctxt_set);
 }
-
 
 /// functions for updating context in phase 2 regeneration. START.
 
@@ -1161,7 +1204,8 @@ void combine_cluster(LT_cluster * c_new, LT_cluster * c_old) {
  * LT_tbl_entry's to_states list.
  */
 void lt_phase2_propagateContextChange(
-    int state_no, LT_cluster * c, LT_tbl_entry * e) {
+    int state_no, LT_cluster * c, LT_tbl_entry * e)
+{
   llist_int * t;
   LT_tbl_entry * f;
   llist_int2 * t2;
@@ -1196,7 +1240,8 @@ void lt_phase2_propagateContextChange(
 }
 
 
-BOOL inheritParentContext(State * s, State * parent) {
+BOOL inheritParentContext(State * s, State * parent)
+{
   int i, ct;
   Configuration * c, * c_p;
   SymbolTblNode * trans_symbol;
@@ -1244,7 +1289,8 @@ BOOL inheritParentContext(State * s, State * parent) {
 /*
  * Set a state's all configs' context to empty.
  */
-void clearStateContext(State * s) {
+void clearStateContext(State * s)
+{
   int i, ct;
   if (NULL == s) return;
 
@@ -1269,7 +1315,8 @@ void clearStateContext(State * s) {
  *  FALSE - combined with a cluster in all_clusters..
  *  TRUE - NOT combined with another cluster in all_clusters.
  */
-BOOL cluster_trace_new_chain(int parent_state_no, int state_no) {
+BOOL cluster_trace_new_chain(int parent_state_no, int state_no)
+{
   LT_cluster * container, * first_container;
   LT_tbl_entry * e; // for the one with state_no.
   llist_context_set * e_ctxt;
@@ -1407,7 +1454,8 @@ printf("=>5. state %d: clear, inherit context from state %d, regenerate\n",
 /*
  * parent_state: state_no of the parent state.
  */
-BOOL cluster_trace_new_chain_all(int parent_state, LT_tbl_entry * e) {
+BOOL cluster_trace_new_chain_all(int parent_state, LT_tbl_entry * e)
+{
   llist_int * s;
   BOOL is_new_chain = TRUE;
 
@@ -1426,7 +1474,8 @@ BOOL cluster_trace_new_chain_all(int parent_state, LT_tbl_entry * e) {
  * Add c to the all_clusters list.
  * c is always added to the tail of all_clusters.
  */
-void all_clusters_add(LT_cluster * c) {
+void all_clusters_add(LT_cluster * c)
+{
   if (all_clusters == NULL) {
     all_clusters_tail = all_clusters = c;
   } else { // add to the tail.
@@ -1436,7 +1485,8 @@ void all_clusters_add(LT_cluster * c) {
 }
 
 
-void phase2_regeneration2() {
+void phase2_regeneration2()
+{
   LT_tbl_entry * e, * x;
   BOOL is_new_chain = TRUE;
 
@@ -1483,7 +1533,8 @@ void phase2_regeneration2() {
 
 /* for laneHeads list */
 
-static laneHead * createLaneHead(State * s, SymbolTblNode * n) {
+static laneHead * createLaneHead(State * s, SymbolTblNode * n)
+{
   laneHead * h;
   HYY_NEW(h, laneHead, 1);
   h->s = s;
@@ -1495,7 +1546,8 @@ static laneHead * createLaneHead(State * s, SymbolTblNode * n) {
 }
 
 
-static void destroyLaneHeadNode(laneHead * h) {
+static void destroyLaneHeadNode(laneHead * h)
+{
   if (NULL == h) return;
 
   freeSymbolNodeList(h->contexts);
@@ -1508,7 +1560,8 @@ static void destroyLaneHeadNode(laneHead * h) {
  *
  * Called by addLaneHeadList() only, h and n are Not NULL.
  */
-static void addContextToLaneHead(laneHead * h, SymbolTblNode * n) {
+static void addContextToLaneHead(laneHead * h, SymbolTblNode * n)
+{
   SymbolNode * sn, * sn_prev, * tmp;
   for (sn_prev = NULL, sn = h->contexts; sn != NULL; 
        sn_prev = sn, sn = sn->next) {
@@ -1534,7 +1587,8 @@ static void addContextToLaneHead(laneHead * h, SymbolTblNode * n) {
  * Add another pair of s to h.
  * lh_list is in INC order of state's state_no;
  */
-static laneHead * addLaneHeadList(laneHead * lh_list, State * s) {
+static laneHead * addLaneHeadList(laneHead * lh_list, State * s)
+{
   laneHead * h, * h_prev, * tmp;
   if (s == NULL) {
     YYERR_EXIT("lane_tracing.c addLaneHead error: s is NULL");
@@ -1563,7 +1617,8 @@ static laneHead * addLaneHeadList(laneHead * lh_list, State * s) {
 }
 
 
-static void dumpLaneHeadList(laneHead * lh_list) {
+static void dumpLaneHeadList(laneHead * lh_list)
+{
   laneHead * h;
   //SymbolNode * n;
 
@@ -1581,7 +1636,8 @@ static void dumpLaneHeadList(laneHead * lh_list) {
  * Used when USE_LANE_TRACING == TRUE only.
  * Called in y.c function createConfig().
  */
-OriginatorList * createOriginatorList() {
+OriginatorList * createOriginatorList()
+{
   OriginatorList * o;
   HYY_NEW(o, OriginatorList, 1);
   o->size = OriginatorList_Len_Init;
@@ -1591,7 +1647,8 @@ OriginatorList * createOriginatorList() {
 }
 
 
-void expandOriginatorList(OriginatorList * o) {
+void expandOriginatorList(OriginatorList * o)
+{
   if (NULL == o || o->count < o->size) return;
 
   o->size *= 2;
@@ -1609,7 +1666,8 @@ void expandOriginatorList(OriginatorList * o) {
  *             NOT a cycle, should NOT insert to originator list.
  */
 BOOL insertOriginatorList(
-    Configuration * c, Configuration * originator, int cycle) {
+    Configuration * c, Configuration * originator, int cycle)
+{
   int i, ct;
   OriginatorList * o = c->originators;
 
@@ -1629,7 +1687,8 @@ BOOL insertOriginatorList(
 }
 
 
-void writeOriginatorList(OriginatorList * o) {
+void writeOriginatorList(OriginatorList * o)
+{
   int i;
   Configuration * c;
   if (o == NULL) return;
@@ -1645,7 +1704,8 @@ void writeOriginatorList(OriginatorList * o) {
 /*
  * Add transitor to c's transitor list if it does not exist yet.
  */
-static BOOL insertTransitorList(Configuration * c, Configuration * transitor) {
+static BOOL insertTransitorList(Configuration * c, Configuration * transitor)
+{
   int i, ct;
   OriginatorList * o = c->transitors;
 
@@ -1666,7 +1726,8 @@ static BOOL insertTransitorList(Configuration * c, Configuration * transitor) {
 
 /* for inadequate states */
 
-StateNoArray * createStateNoArray() {
+StateNoArray * createStateNoArray()
+{
   StateNoArray * sa;
   HYY_NEW(sa, StateNoArray, 1);
   sa->size = 2; // start value. 
@@ -1677,7 +1738,8 @@ StateNoArray * createStateNoArray() {
 }
 
 
-static void expandStateNoArray(StateNoArray * sa) {
+static void expandStateNoArray(StateNoArray * sa)
+{
   sa->size *= 2;
   HYY_EXPAND(sa->states, int, sa->size);
 }
@@ -1685,7 +1747,8 @@ static void expandStateNoArray(StateNoArray * sa) {
 /*
  * If state_no is not in the inadequate states list, add it.
  */
-void addStateNoArray(StateNoArray * sa, int state_no) {
+void addStateNoArray(StateNoArray * sa, int state_no)
+{
   int i, ct;
   if (sa->count == sa->size) { expandStateNoArray(sa); }
 
@@ -1697,7 +1760,8 @@ void addStateNoArray(StateNoArray * sa, int state_no) {
   sa->states[sa->count ++] = state_no;
 }
 
-void dumpStateNoArray(StateNoArray * sa) {
+void dumpStateNoArray(StateNoArray * sa)
+{
   int i, ct;
   if (sa == NULL) return;
 
@@ -1710,7 +1774,8 @@ void dumpStateNoArray(StateNoArray * sa) {
 
 
 /* for debug use */
-void my_writeSymbolNodeArray(SymbolNode * str) {
+void my_writeSymbolNodeArray(SymbolNode * str)
+{
   SymbolNode * a;
   for (a = str; a != NULL; a = a->next) {
     if (a != str) printf(", ");
@@ -1718,7 +1783,8 @@ void my_writeSymbolNodeArray(SymbolNode * str) {
   }
 }
 
-void my_writeContext(Context * c) {
+void my_writeContext(Context * c)
+{
   SymbolNode * s;
 
   printf(" {");
@@ -1747,7 +1813,8 @@ void my_writeContext(Context * c) {
 
   printf("} ");
 }
-static void my_writeProduction(Production * p, int marker) {
+static void my_writeProduction(Production * p, int marker)
+{
   int i;
   SymbolNode * n;
 
@@ -1782,7 +1849,8 @@ static void my_writeProduction(Production * p, int marker) {
 
 void my_writeConfigOriginators(Configuration * c);
 
-void stdout_writeConfig(Configuration * c) {
+void stdout_writeConfig(Configuration * c)
+{
   printf("config (%d.%d) : ", c->owner->state_no, c->ruleID);
   if (c == NULL) {
     return;
@@ -1794,7 +1862,8 @@ void stdout_writeConfig(Configuration * c) {
   printf("[LANE_END: %d]", c->LANE_END);
   printf("[LANE_CON: %d]\n", c->LANE_CON);
 }
-void my_writeState(State * s) {
+void my_writeState(State * s)
+{
   int i, ct;
   printf("state_no: %d (core: %d)\n", 
          s->state_no, s->core_config_count);
@@ -1809,7 +1878,8 @@ void my_writeState(State * s) {
 /*
  * For debug use.
  */
-void writeConfigOriginators(Configuration * c) {
+void writeConfigOriginators(Configuration * c)
+{
   int i, ct = c->originators->count;
   Configuration * o;
   if (ct == 0) return;
@@ -1823,7 +1893,8 @@ void writeConfigOriginators(Configuration * c) {
 }
 
 
-void writeConfigTransitors(Configuration * c) {
+void writeConfigTransitors(Configuration * c)
+{
   int i, ct = c->transitors->count;
   Configuration * o;
   if (ct == 0) return;
@@ -1837,7 +1908,8 @@ void writeConfigTransitors(Configuration * c) {
 }
 
 
-void my_writeConfigOriginators(Configuration * c) {
+void my_writeConfigOriginators(Configuration * c)
+{
   int i, ct = c->originators->count;
   Configuration * o;
   printf("config has %d originators: \n", ct);
@@ -1852,7 +1924,8 @@ void my_writeConfigOriginators(Configuration * c) {
 /*
  * get context for reduce productions in conflict states.
  */
-static void getInadequateStateReduceConfigContext(State * s) {
+static void getInadequateStateReduceConfigContext(State * s)
+{
   int i, ct;
   Configuration * c;
   ct = s->config_count;
@@ -1873,7 +1946,8 @@ static void getInadequateStateReduceConfigContext(State * s) {
 }
 
 
-static void lane_tracing_phase1() {
+static void lane_tracing_phase1()
+{
   int i, ct, state_no;
   State * s;
 
@@ -1896,7 +1970,8 @@ static void lane_tracing_phase1() {
 /*
  * called by update_action_table().
  */
-static int findSuccessorStateNo(int state_no, SymbolTblNode * snode) {
+static int findSuccessorStateNo(int state_no, SymbolTblNode * snode)
+{
   int i;
   State * successor;
   State * state = states_new_array->state_list[state_no];
@@ -1927,7 +2002,8 @@ static int findSuccessorStateNo(int state_no, SymbolTblNode * snode) {
 /*
  * clear all the conflicts from states_new_array->conflict_list.
  */
-static void clearStateConflicts(int state_no) {
+static void clearStateConflicts(int state_no)
+{
   Conflict * tmp;
   Conflict * list = states_new_array->conflict_list[state_no];
  
@@ -1959,7 +2035,8 @@ static void clearStateConflicts(int state_no) {
  *  }
  * }
  */
-static void resolve_LALR1_conflicts() {
+static void resolve_LALR1_conflicts()
+{
   int i, j, ct, state_no;
   State * state;
   Configuration * config;
@@ -2019,7 +2096,8 @@ static void resolve_LALR1_conflicts() {
 }
 
 
-void writeConflictingContext(int state_no) {
+void writeConflictingContext(int state_no)
+{
   Conflict * c;
   c = states_new_array->conflict_list[state_no];
   if (c == NULL) return;
@@ -2032,7 +2110,8 @@ void writeConflictingContext(int state_no) {
 }
 
 
-static laneHead * removePassThroughStates(laneHead * lh_list) {
+static laneHead * removePassThroughStates(laneHead * lh_list)
+{
   laneHead * h, * h_prev, * tmp;
   for (h_prev = NULL, h = lh_list; h != NULL; ) {
 #if DEBUG_PHASE_2
@@ -2063,7 +2142,8 @@ static laneHead * removePassThroughStates(laneHead * lh_list) {
 }
 
 
-static void GPM(State * new_state) {
+static void GPM(State * new_state)
+{
   if (DEBUG_GEN_PARSING_MACHINE == TRUE) {
     printf("\n\n--generate parsing machine--\n");
     printf("states_new count: %d\n", states_new->state_count);
@@ -2090,7 +2170,8 @@ static void GPM(State * new_state) {
 }
 
 
-static void writeStateNoArray(StateNoArray * a, char * name) {
+static void writeStateNoArray(StateNoArray * a, char * name)
+{
   int i, ct;
   if (name != NULL) { printf("%s: ", name); }
   for (i = 0, ct = a->count; i < ct; i ++) {
@@ -2103,7 +2184,8 @@ static void writeStateNoArray(StateNoArray * a, char * name) {
 /*
  * Adapted from transition() in y.c.
  */
-static State_collection * getStateSuccessors(State * s) {
+static State_collection * getStateSuccessors(State * s)
+{
   int i;
   Configuration * c, * new_config;
   SymbolTblNode * scanned_symbol = NULL;
@@ -2151,7 +2233,8 @@ static State_collection * getStateSuccessors(State * s) {
  * successor of s that has this trans_symbol.
  */
 static int getSuccessorIndex(
-    State * s, SymbolTblNode * trans_symbol) {
+    State * s, SymbolTblNode * trans_symbol)
+{
   int i, len;
   for (i = 0, len = s->successor_count; i < len; i ++) {
     if (s->successor_list[i]->trans_symbol->snode == trans_symbol) {
@@ -2175,7 +2258,8 @@ static int getSuccessorIndex(
  * @Return - TRUE if a new state is really added.
  *          FALSE if an existing state is found.
  */
-static BOOL addSplitState(State * Y, State * S, int successor_index) {
+static BOOL addSplitState(State * Y, State * S, int successor_index)
+{
   State * os;
   int is_compatible;
 
@@ -2207,7 +2291,8 @@ static BOOL addSplitState(State * Y, State * S, int successor_index) {
 }
 
 
-static laneHead * addUniqueQueue(State * s, laneHead * lh_list) {
+static laneHead * addUniqueQueue(State * s, laneHead * lh_list)
+{
   laneHead * h;
   if ((h = lh_list) == NULL) return createLaneHead(s, NULL);
 
@@ -2239,7 +2324,8 @@ static laneHead * addUniqueQueue(State * s, laneHead * lh_list) {
  * function: they contains the same number of configurations.
  * T will be destroyed, so its context lists can be moved to S.
  */
-static void regenerateStateContext(State * S, State * T) {
+static void regenerateStateContext(State * S, State * T)
+{
   int i, ct;
   Context * c;
   //Context * d;
@@ -2268,7 +2354,8 @@ static void regenerateStateContext(State * S, State * T) {
 /*
  * Combine the contexts from T to S. No propagation here.
  */
-static BOOL combineStateContext(State * s_dest, State * s_src) {
+static BOOL combineStateContext(State * s_dest, State * s_src)
+{
   BOOL isChanged = FALSE;
   int i;
 
@@ -2288,7 +2375,8 @@ static BOOL combineStateContext(State * s_dest, State * s_src) {
  * note that transition actions are handled by addSplitState()
  * or keep unchanged.
  */
-static void updateStateReduceAction(State * S) {
+static void updateStateReduceAction(State * S)
+{
   int i, ct;
   SymbolNode * lookahead;
   Configuration * c;
@@ -2351,7 +2439,8 @@ static void updateStateReduceAction(State * S) {
  * GPM() on the new states.
  * ==END==
  */
-static void phase2_regeneration(laneHead * lh_list) {
+static void phase2_regeneration(laneHead * lh_list)
+{
   laneHead * h;
   int successor_index;
   State * S, * Y, * Y0;
@@ -2428,7 +2517,8 @@ static void phase2_regeneration(laneHead * lh_list) {
 }
 
 
-static void writeTheSymbolList(SymbolList a) {
+static void writeTheSymbolList(SymbolList a)
+{
   SymbolNode * b = a;
   printf("{");
   if (b != NULL) {
@@ -2442,7 +2532,8 @@ static void writeTheSymbolList(SymbolList a) {
 }
 
 
-static SymbolNode * getTheContext(Configuration * o) {
+static SymbolNode * getTheContext(Configuration * o)
+{
   SymbolNode * gamma, * scanned_symbol, * gamma_theads;
   int exist;
   if (o == NULL) return NULL;
@@ -2488,7 +2579,8 @@ static SymbolNode * getTheContext(Configuration * o) {
  * c is the originator of c0.
  */
 laneHead * trace_back(
-    Configuration * c0, Configuration * c, laneHead * lh_list) {
+    Configuration * c0, Configuration * c, laneHead * lh_list)
+{
   Configuration * o;
   int i, len;
 
@@ -2561,7 +2653,8 @@ laneHead * trace_back(
  * lane_head_tail_pairs list.
  */
 void trace_back_lrk(
-    Configuration * c0, Configuration * c) {
+    Configuration * c0, Configuration * c)
+{
   Configuration * o;
   int i, len;
 
@@ -2621,7 +2714,8 @@ void trace_back_lrk(
  *          LANE_END configurations.
  */
 void trace_back_lrk_clear(
-    Configuration * c0, Configuration * c) {
+    Configuration * c0, Configuration * c)
+{
   Configuration * o;
   int i, len;
 
@@ -2649,7 +2743,8 @@ void trace_back_lrk_clear(
  * Do this by tracing back each final config from this state.
  */
 static laneHead * getStateConflictLaneHead(
-    int state_no, laneHead * lh_list) {
+    int state_no, laneHead * lh_list)
+{
   State * s;
   Configuration * con;
   int i, len;
@@ -2679,7 +2774,8 @@ static laneHead * getStateConflictLaneHead(
  * Get those states from which conflicting lanes start from,
  * and their associated conflicting contexts.
  */
-static laneHead * getConflictLaneHead() {
+static laneHead * getConflictLaneHead()
+{
   int i, state_no;
   laneHead * laneHeadList = NULL;
 
@@ -2713,7 +2809,8 @@ static laneHead * getConflictLaneHead() {
 }
 
 
-static void lane_tracing_phase2() {
+static void lane_tracing_phase2()
+{
   int ct;
   laneHead * laneHeadList;
 
@@ -2747,7 +2844,8 @@ static void lane_tracing_phase2() {
 }
 
 
-void lane_tracing() {
+void lane_tracing()
+{
   IN_EDGE_PUSHING_LANE_TRACING = FALSE;
   MAX_K = 1; // max K used in LR(k).
 
@@ -2780,7 +2878,8 @@ void lane_tracing() {
 /* Functions for lane tracing */
 
 
-static void dump_stacks() {
+static void dump_stacks()
+{
   puts("__STACK__"); stack_dump(STACK);
   puts("__LANE__ "); stack_dump(LANE);
 }
@@ -2792,7 +2891,8 @@ static void dump_stacks() {
  *
  * A null terminal is "", which is an empty string.
  */
-BOOL testA(SymbolNode * n) {
+BOOL testA(SymbolNode * n)
+{
   for (; n != NULL; n = n->next) {
     if (strlen(n->snode->symbol) != 0) return TRUE; 
   }
@@ -2826,7 +2926,8 @@ BOOL testA(SymbolNode * n) {
  *  exist - label whether snode already existed.
  */
 static SymbolNode * insertSymbolList_unique(
-                    SymbolList list, SymbolTblNode * snode, int * exist) {
+                    SymbolList list, SymbolTblNode * snode, int * exist)
+{
   SymbolNode * n, * n_prev, * new_node;
   * exist = 0;
 
@@ -2862,7 +2963,8 @@ static SymbolNode * insertSymbolList_unique(
  * Assumption: list != NULL, c != NULL.
  */
 SymbolNode * combineContextList(
-                    SymbolList list, SymbolList new_list) {
+                    SymbolList list, SymbolList new_list)
+{
   int exist;
 
   if (new_list == NULL) return list;
@@ -2879,7 +2981,8 @@ SymbolNode * combineContextList(
  * NOT including nodes that contain empty string.
  */
 SymbolList getCONTEXTS_GENERATED(SymbolList list, 
-                                 int * null_possible) {
+                                 int * null_possible)
+{
   int exist;
   SymbolNode * sn = NULL;
   * null_possible = 0;
@@ -2895,7 +2998,8 @@ SymbolList getCONTEXTS_GENERATED(SymbolList list,
 }
 
 
-static void stack_operation(int * fail_ct, Configuration * o) {
+static void stack_operation(int * fail_ct, Configuration * o)
+{
   Configuration * tmp;
 
   (* fail_ct) ++;
@@ -2930,7 +3034,8 @@ static void stack_operation(int * fail_ct, Configuration * o) {
 }
 
 
-static void MOVE_MARKERS(Configuration * o) {
+static void MOVE_MARKERS(Configuration * o)
+{
   Configuration * c;
   int ct;
   int r = 0;
@@ -2968,7 +3073,8 @@ static void MOVE_MARKERS(Configuration * o) {
  *       array directly.
  */
 static void CONTEXT_ADDING(
-    SymbolList CONTEXT_GENERATED, int cur_config_index) {
+    SymbolList CONTEXT_GENERATED, int cur_config_index)
+{
   SymbolNode * tmp, * n; 
   int ct, exist;
   Configuration * c;
@@ -3003,7 +3109,8 @@ static void CONTEXT_ADDING(
 
 static void CONTEXT_ADDING_ROUTINE(
     SymbolList CONTEXT_GENERATED, Configuration * o,
-    int cur_config_index, int * fail_ct) {
+    int cur_config_index, int * fail_ct)
+{
   CONTEXT_ADDING(CONTEXT_GENERATED, cur_config_index);
 
   if (TRACE_FURTHER == FLAG_ON) {
@@ -3028,7 +3135,8 @@ static void CONTEXT_ADDING_ROUTINE(
  * Do lane_tracing Phase 1 on a configuration.
  * Pre-assumption: c is a reduction.
  */
-void lane_tracing_reduction(Configuration * c) {
+void lane_tracing_reduction(Configuration * c)
+{
   if (NULL == c) return;
 
 #if DEBUG_PHASE_1
@@ -3064,7 +3172,8 @@ puts("DO_LOOP:");
  * For debug use only.
  */
 static void dumpLaneStartStates(
-    Configuration * o, SymbolList gamma_theads) {
+    Configuration * o, SymbolList gamma_theads)
+{
   if (NULL == gamma_theads) return;
 
   printf("START %d.%d: %d.%d generates contexts",
@@ -3078,7 +3187,8 @@ static void dumpLaneStartStates(
 }
 
 
-void my_showTHeads(SymbolList alpha, SymbolList theads) {
+void my_showTHeads(SymbolList alpha, SymbolList theads)
+{
   SymbolNode * a;
 
   printf("string '");
@@ -3100,7 +3210,8 @@ void my_showTHeads(SymbolList alpha, SymbolList theads) {
 }
 
 
-static void writeConfig(Configuration * c) {
+static void writeConfig(Configuration * c)
+{
   if (NULL == c) printf("NULL ");
   else printf("%d.%d ", c->owner->state_no, c->ruleID);
 }
@@ -3109,7 +3220,8 @@ static void writeConfig(Configuration * c) {
 /*
  * Returns TRUE is one of c's originators is o.
  */
-static BOOL is_on_transitor_chain(Configuration * c, Configuration * o) {
+static BOOL is_on_transitor_chain(Configuration * c, Configuration * o)
+{
   int i, ct;
   ct = c->originators->count;
   for (i = 0; i < ct; i ++) {
@@ -3123,7 +3235,8 @@ static BOOL is_on_transitor_chain(Configuration * c, Configuration * o) {
  * o - the originator. o does not change in the call stack.
  */
 static void set_transitors_pass_thru_on(
-    Configuration * cur_config, Configuration * o) {
+    Configuration * cur_config, Configuration * o)
+{
   int i, ct;
   Configuration * c;
 
@@ -3175,7 +3288,8 @@ static void set_transitors_pass_thru_on(
 /*
  * let s = c->owner, find transitors for c in parent states of s.
  */
-static void get_transitors(Configuration * c0, Configuration * c) {
+static void get_transitors(Configuration * c0, Configuration * c)
+{
   int i, j;
   Configuration * t; // transitor.
   State * p; // parent_state.
@@ -3224,7 +3338,8 @@ static void get_transitors(Configuration * c0, Configuration * c) {
  * Originator: a config d in current state,
  *   d.scanned_symbol = c.LHS_symbol
  */
-static void get_originators(Configuration * c0, Configuration * c) {
+static void get_originators(Configuration * c0, Configuration * c)
+{
   int i;
   Configuration * d;
 
@@ -3255,7 +3370,8 @@ static void get_originators(Configuration * c0, Configuration * c) {
 ///!!!!!!!!!!!!!!!!!!!!!!!!!!! END.
 
 
-static void DO_LOOP() {
+static void DO_LOOP()
+{
   int i, ct;
   Configuration * cur_config, * o;
   SymbolNode * gamma, * scanned_symbol, * gamma_theads;
@@ -3458,7 +3574,8 @@ if (IN_EDGE_PUSHING_LANE_TRACING == TRUE) { /// 12-19-2008.
 }
 
 
-static void POP_LANE() {
+static void POP_LANE()
+{
 
 #if DEBUG_PHASE_1
   puts("POP_LANE");
@@ -3469,7 +3586,8 @@ static void POP_LANE() {
 }
 
 
-static void CHECK_STACK_TOP() {
+static void CHECK_STACK_TOP()
+{
   Configuration * top = stack_top(STACK);
 
   if (top == LT_MARKER) {
@@ -3506,7 +3624,8 @@ static void CHECK_STACK_TOP() {
 }
 
 
-static void PROPOGATE_CONTEXT_SETS(Configuration * c) {
+static void PROPOGATE_CONTEXT_SETS(Configuration * c)
+{
   State * s;
   Configuration * f;
   int i, ct;
@@ -3538,7 +3657,8 @@ static void PROPOGATE_CONTEXT_SETS(Configuration * c) {
 
 
 
-static void CHECK_LANE_TOP() {
+static void CHECK_LANE_TOP()
+{
   Configuration * lane_top = stack_top(LANE);
 
   if (lane_top == LT_MARKER) {
@@ -3577,7 +3697,3 @@ static void CHECK_LANE_TOP() {
     }
   }
 }
-
-
-
-

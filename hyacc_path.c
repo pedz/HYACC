@@ -6,10 +6,11 @@
 
 #include "y.h"
 
-void show_manpage() {
-   system("less /usr/local/lib/hyacc/hyaccmanpage");
+void show_manpage()
+{
+  system("less /usr/local/lib/hyacc/hyaccmanpage");
 }
 
 char * HYACC_PATH = 
-  "/usr/local/lib/hyacc/hyaccpar";
+"/usr/local/lib/hyacc/hyaccpar";
 

@@ -38,7 +38,8 @@
 //////////////////////////////////////////////////////////////////
   
 static ConfigPairNode * ConfigPairNode_create(
-    Configuration * conflict_config, Configuration * lane_start_config) {
+    Configuration * conflict_config, Configuration * lane_start_config)
+{
   ConfigPairNode * n;
   HYY_NEW(n, ConfigPairNode, 1);
   n->end = conflict_config;
@@ -48,7 +49,8 @@ static ConfigPairNode * ConfigPairNode_create(
 } 
 
 
-static void ConfigPairNode_destroy(ConfigPairNode * n) {
+static void ConfigPairNode_destroy(ConfigPairNode * n)
+{
   free(n);
 }
 
@@ -57,7 +59,8 @@ static void ConfigPairNode_destroy(ConfigPairNode * n) {
  * compare function: 1 - greater than, 0 - equal, -1 - less than.
  */
 static int ConfigPair_cmp(Configuration * end1, Configuration * start1,
-    Configuration * end2, Configuration * start2) {
+    Configuration * end2, Configuration * start2)
+{
   int cmp;
 
   cmp = start1->owner->state_no - start2->owner->state_no;
@@ -87,7 +90,8 @@ static int ConfigPair_cmp(Configuration * end1, Configuration * start1,
 /*
  * Combine list s(ource) to list t(arget).
  */
-ConfigPairList ConfigPairList_combine(ConfigPairList t, ConfigPairList s) {
+ConfigPairList ConfigPairList_combine(ConfigPairList t, ConfigPairList s)
+{
   ConfigPairNode * n;
   if (s == NULL) return t;
   if (t == NULL) return s;
@@ -106,7 +110,8 @@ ConfigPairList ConfigPairList_combine(ConfigPairList t, ConfigPairList s) {
  *   lane_start_config's state_no and ruleID.
  */
 ConfigPairList ConfigPairList_insert(ConfigPairList list,
-    Configuration * conflict_config, Configuration * lane_start_config) {
+    Configuration * conflict_config, Configuration * lane_start_config)
+{
   ConfigPairNode * n, * n_prev, * m;
   int cmp;
 
@@ -141,7 +146,8 @@ ConfigPairList ConfigPairList_insert(ConfigPairList list,
 }
 
 
-static void ConfigPairNode_dump(ConfigPairNode * n) {
+static void ConfigPairNode_dump(ConfigPairNode * n)
+{
   printf("(%d.%d -> %d.%d)",
          n->start->owner->state_no, n->start->ruleID,
          n->end->owner->state_no, n->end->ruleID);
@@ -152,7 +158,8 @@ static void ConfigPairNode_dump(ConfigPairNode * n) {
 }
 
 
-void ConfigPairList_dump(ConfigPairList list) {
+void ConfigPairList_dump(ConfigPairList list)
+{
   ConfigPairNode * n;
 
   puts("--ConfigPairList--");
@@ -167,7 +174,8 @@ void ConfigPairList_dump(ConfigPairList list) {
  * Note that more than one LANE_END configurations could be found.
  */
 ConfigPairNode * ConfigPairList_find(
-    ConfigPairList list, Configuration * conflict_config) {
+    ConfigPairList list, Configuration * conflict_config)
+{
   ConfigPairNode * n;
   for (n = list; n != NULL; n = n->next) {
     if (n->end == conflict_config) {
@@ -181,7 +189,8 @@ ConfigPairNode * ConfigPairList_find(
 } 
 
 
-void ConfigPairList_destroy(ConfigPairList list) {
+void ConfigPairList_destroy(ConfigPairList list)
+{
   ConfigPairNode * n, * tmp;
 
   n = list;
@@ -206,7 +215,8 @@ void ConfigPairList_destroy(ConfigPairList list) {
 /*
  * Create new set object.
  */
-static Object_item * Object_item_new(void * object) {
+static Object_item * Object_item_new(void * object)
+{
   Object_item * s;
   HYY_NEW(s, Object_item, 1);
   s->object = object;
@@ -214,7 +224,8 @@ static Object_item * Object_item_new(void * object) {
   return s;
 }
 
-static void Object_item_destroy(Object_item * s) {
+static void Object_item_destroy(Object_item * s)
+{
   free(s);
 }
 
@@ -224,7 +235,8 @@ static void Object_item_destroy(Object_item * s) {
  * the contents of the object, then a separate function should 
  * be written for this.
  */
-Set * Set_insert(Set * set, void * object) {
+Set * Set_insert(Set * set, void * object)
+{
   Set * s;
 
   if (set == NULL) { return Object_item_new(object); }
@@ -242,7 +254,8 @@ Set * Set_insert(Set * set, void * object) {
 }
 
 
-Object_item * Set_find(Set * set, void * object) {
+Object_item * Set_find(Set * set, void * object)
+{
   Set * s;
 
   for (s = set; s != NULL; s = s->next) {
@@ -253,7 +266,8 @@ Object_item * Set_find(Set * set, void * object) {
 }
 
 
-Set * Set_delete(Set * set, void * object) {
+Set * Set_delete(Set * set, void * object)
+{
   Set * s, * s_prev;
 
   if (set == NULL) { return NULL; }
@@ -281,7 +295,8 @@ Set * Set_delete(Set * set, void * object) {
 /*
  * A function pointer is passed in. This function dumps the set item.
  */
-void Set_dump(Set * set, void (* set_item_dump)(void *)) {
+void Set_dump(Set * set, void (* set_item_dump)(void *))
+{
   Set * s;
 
   if (set == NULL) {
@@ -306,7 +321,8 @@ void Set_dump(Set * set, void (* set_item_dump)(void *)) {
 
 
 // create an empty list.
-List * List_create() {
+List * List_create()
+{
   List * t;
   HYY_NEW(t, List, 1);
   t->head = NULL;
@@ -318,7 +334,8 @@ List * List_create() {
 
 // insert new object at tail of list t, 
 // without checking if the object already exists.
-void List_insert_tail(List * t, void * object) {
+void List_insert_tail(List * t, void * object)
+{
   if (NULL == object || NULL == t) return;
 
   if (t->head == NULL) {
@@ -332,7 +349,8 @@ void List_insert_tail(List * t, void * object) {
 }
 
 
-void List_destroy(List * t) {
+void List_destroy(List * t)
+{
   Object_item * o, * tmp;
 
   if (NULL == t) return;
@@ -348,7 +366,8 @@ void List_destroy(List * t) {
 }
 
 
-void List_dump(List * t, void (* list_item_dump)(void *)) {
+void List_dump(List * t, void (* list_item_dump)(void *))
+{
   int i;
   Object_item * s;
   
@@ -377,7 +396,8 @@ void List_dump(List * t, void (* list_item_dump)(void *)) {
 //////////////////////////////////////////////////////////////////
 
 // create a parsing table.
-LRk_P_T * LRk_P_T_create(int k) {
+LRk_P_T * LRk_P_T_create(int k)
+{
   LRk_P_T * t;
   HYY_NEW(t, LRk_P_T, 1);
   t->k = k;
@@ -387,7 +407,8 @@ LRk_P_T * LRk_P_T_create(int k) {
 }
 
 
-void LRk_P_T_dump(LRk_P_T * t) {
+void LRk_P_T_dump(LRk_P_T * t)
+{
   LRk_P_T_row * r;
   ConfigPairNode * n;
   Configuration * c;
@@ -423,7 +444,8 @@ void LRk_P_T_dump(LRk_P_T * t) {
 /*
  * Same as LRk_P_T_dump() but write a file.
  */
-void LRk_P_T_dump_FILE(LRk_P_T * t, FILE * fp) {
+void LRk_P_T_dump_FILE(LRk_P_T * t, FILE * fp)
+{
   LRk_P_T_row * r;
   ConfigPairNode * n;
   Configuration * c;
@@ -466,7 +488,8 @@ void LRk_P_T_dump_FILE(LRk_P_T * t, FILE * fp) {
  *          otherwise, return the row before the insertion point.
  */
 LRk_P_T_row * LRk_P_T_find(LRk_P_T * t, 
-    int state, SymbolTblNode * token, int * found) {
+    int state, SymbolTblNode * token, int * found)
+{
   LRk_P_T_row * r, * r_prev;
   int cmp;
 
@@ -500,7 +523,8 @@ LRk_P_T_row * LRk_P_T_find(LRk_P_T * t,
  * @Return: the inserted new row.
  */
 static LRk_P_T_row * LRk_P_T_addRow(LRk_P_T * t, LRk_P_T_row * r_prev, 
-    int state, SymbolTblNode * token) {
+    int state, SymbolTblNode * token)
+{
   LRk_P_T_row * r;
   int i;
 
@@ -532,7 +556,8 @@ static LRk_P_T_row * LRk_P_T_addRow(LRk_P_T * t, LRk_P_T_row * r_prev,
  * Assumptions: t != NULL.
  */
 ConfigPairNode * LRk_P_T_getEntry(LRk_P_T * t, int state,
-    SymbolTblNode * token, SymbolTblNode * col_token, int * exist) {
+    SymbolTblNode * token, SymbolTblNode * col_token, int * exist)
+{
   int index, found;
   LRk_P_T_row * r;
 
@@ -559,7 +584,8 @@ ConfigPairNode * LRk_P_T_getEntry(LRk_P_T * t, int state,
  */
 BOOL LRk_P_T_addReduction(LRk_P_T * t, 
     int state, SymbolTblNode * token, 
-    SymbolTblNode * s, Configuration * c, Configuration * c_tail) {
+    SymbolTblNode * s, Configuration * c, Configuration * c_tail)
+{
   int index, found;
   Configuration * prev_entry;
   ConfigPairNode * n;
@@ -604,7 +630,8 @@ BOOL LRk_P_T_addReduction(LRk_P_T * t,
 // Functions for LR(k) table array. START.
 //////////////////////////////////////////////////////////////////
 
-LRk_P_T_Array * LRk_P_T_Array_create() {
+LRk_P_T_Array * LRk_P_T_Array_create()
+{
   LRk_P_T_Array * a;
   int i;
   HYY_NEW(a, LRk_P_T_Array, 1);
@@ -621,7 +648,8 @@ LRk_P_T_Array * LRk_P_T_Array_create() {
 /*
  * Add t to a.
  */
-void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t) {
+void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t)
+{
   if (NULL == a || NULL == t) return;
 
   if (a->max_k >= a->size + 1) { // expand a->array.
@@ -642,7 +670,8 @@ void LRk_P_T_Array_add(LRk_P_T_Array * a, LRk_P_T * t) {
 /*
  * Get the LR(k) parsing table for k.
  */
-LRk_P_T * LRk_P_T_Array_get(LRk_P_T_Array * a, int k) {
+LRk_P_T * LRk_P_T_Array_get(LRk_P_T_Array * a, int k)
+{
   if (k < 2 || k > a->max_k) return NULL;
   if (a->array[k - 2] == NULL) {
     printf("Warning: LR(%d) table is empty\n", k);
@@ -653,7 +682,8 @@ LRk_P_T * LRk_P_T_Array_get(LRk_P_T_Array * a, int k) {
 }
 
 
-static void writeParsingTblColHdr() {
+static void writeParsingTblColHdr()
+{
   int i;
   printf("--Parsing Table Column Header [Total: %d]--\n", ParsingTblCols);
   for (i = 0; i < ParsingTblCols; i ++) {
@@ -663,7 +693,8 @@ static void writeParsingTblColHdr() {
 }
 
 
-static void writeParsingTblColHdr_FILE(FILE * fp) {
+static void writeParsingTblColHdr_FILE(FILE * fp)
+{
   int i;
   fprintf(fp, "--Parsing Table Column Header [Total: %d]--\n", ParsingTblCols);
   for (i = 0; i < ParsingTblCols; i ++) {
@@ -673,7 +704,8 @@ static void writeParsingTblColHdr_FILE(FILE * fp) {
 }
 
 
-void LRk_P_T_Array_dump(LRk_P_T_Array * a) {
+void LRk_P_T_Array_dump(LRk_P_T_Array * a)
+{
   int i;
   if (NULL == a) return;
 
@@ -692,7 +724,8 @@ void LRk_P_T_Array_dump(LRk_P_T_Array * a) {
 /*
  * Dump to disk.
  */ 
-void LRk_P_T_Array_dump_FILE(LRk_P_T_Array * a) {
+void LRk_P_T_Array_dump_FILE(LRk_P_T_Array * a)
+{
   int i;
   FILE * fp;
   if (NULL == a) return;
@@ -725,7 +758,8 @@ void LRk_P_T_Array_dump_FILE(LRk_P_T_Array * a) {
 
 
 cfg_ctxt * cfg_ctxt_create(Configuration * c, SymbolList s, 
-    Configuration * tail) {
+    Configuration * tail)
+{
   cfg_ctxt * cc;
   HYY_NEW(cc, cfg_ctxt, 1);
   cc->c = c;
@@ -735,12 +769,14 @@ cfg_ctxt * cfg_ctxt_create(Configuration * c, SymbolList s,
 }
 
 
-void cfg_ctxt_destroy(cfg_ctxt * cc) {
+void cfg_ctxt_destroy(cfg_ctxt * cc)
+{
   free(cc);
 }
 
 
-void cfg_ctxt_dump(cfg_ctxt * cc) {
+void cfg_ctxt_dump(cfg_ctxt * cc)
+{
   SymbolList a;
   if (NULL == cc) return;
   printf("cfg_ctxt: %d.%d { ", cc->c->owner->state_no, cc->c->ruleID);
@@ -777,7 +813,8 @@ void cfg_ctxt_dump(cfg_ctxt * cc) {
 // Note: k >= 2.
 // @Return: a COPY of the head of the original string is returned.
 //
-SymbolList getStringWithKNonVanishSymbol(SymbolList alpha, int k) {
+SymbolList getStringWithKNonVanishSymbol(SymbolList alpha, int k)
+{
   SymbolNode * cpy, * cpy_tail, * pt; // copy.
   int i; // count of non-vanish symbols.
 
@@ -805,7 +842,8 @@ SymbolList getStringWithKNonVanishSymbol(SymbolList alpha, int k) {
 // return the new list.
 //
 SymbolNode * replaceWithRHS(
-    SymbolList new_list, SymbolNode * n_prev, int ruleID) {
+    SymbolList new_list, SymbolNode * n_prev, int ruleID)
+{
   SymbolList rhs;
   SymbolNode * rhs_tail, * tmp;
 
@@ -844,7 +882,8 @@ SymbolNode * replaceWithRHS(
 }
 
 
-BOOL isSameSymbolList(SymbolList a, SymbolList b) {
+BOOL isSameSymbolList(SymbolList a, SymbolList b)
+{
   for (; (a != NULL) && (b != NULL); a = a->next, b = b->next) {
     if (a->snode != b->snode) return FALSE;
   }
@@ -854,7 +893,8 @@ BOOL isSameSymbolList(SymbolList a, SymbolList b) {
 
 
 // assumption: new_list != NULL, t != NULL.
-BOOL lrk_thead_in_list(List * t, SymbolList new_list) {
+BOOL lrk_thead_in_list(List * t, SymbolList new_list)
+{
   Object_item * o;
   if (NULL == t || new_list == NULL) {
     puts("lrk_thead_in_list ERROR: t or nwe_list is NULL");
@@ -875,7 +915,8 @@ BOOL lrk_thead_in_list(List * t, SymbolList new_list) {
 // Assumption: k >= 2.
 // Truncate list s so it contains up to k non-vanishable symbols.
 //
-static SymbolList lrk_theads_truncate_list_by_k(SymbolList s, int k) {
+static SymbolList lrk_theads_truncate_list_by_k(SymbolList s, int k)
+{
   SymbolNode * t, * tmp;
   int i;
   if(NULL == s) return NULL;
@@ -902,7 +943,8 @@ static SymbolList lrk_theads_truncate_list_by_k(SymbolList s, int k) {
 // and truncate until it contains no more than k non-vanishable
 // symbols.
 //
-void addDerivatives(List * t, Object_item * o, int j, int k) {
+void addDerivatives(List * t, Object_item * o, int j, int k)
+{
   SymbolList new_list;
   SymbolNode * m, * n, * n_prev; 
   RuleIDNode * r;
@@ -944,7 +986,8 @@ void addDerivatives(List * t, Object_item * o, int j, int k) {
 // Return TRUE is the j-th symbol of s exists and is Non-terminal.
 // otherwise return FALSE.
 //
-BOOL j_th_symbol_is_NT(SymbolList s, int j) {
+BOOL j_th_symbol_is_NT(SymbolList s, int j)
+{
   int i;
 
   for (i = 0; i < j; i ++) {
@@ -960,7 +1003,8 @@ BOOL j_th_symbol_is_NT(SymbolList s, int j) {
 // 
 // Remove from list t all strings whose j-th symbol is non-terminal.
 // 
-static void lrk_theads_rm_nt(List * t, int j) {
+static void lrk_theads_rm_nt(List * t, int j)
+{
   Object_item * o, * o_prev;
 
 #if DEBUG_LRK_THEADS
@@ -1000,7 +1044,8 @@ static void lrk_theads_rm_nt(List * t, int j) {
 // Returns TRUE if the first k symbols are s are all terminals.
 // Otherwise returns FALSE.
 //
-static BOOL k_heads_are_T(SymbolList s, int k, int * len) {
+static BOOL k_heads_are_T(SymbolList s, int k, int * len)
+{
   int i;
   SymbolList s0 = s;
   * len = -1;
@@ -1027,7 +1072,8 @@ static BOOL k_heads_are_T(SymbolList s, int k, int * len) {
 // Remove from t all strings whose k-heads consist entirely
 // of terminals, and add the k-heads to set t_heads;
 //
-static void lrk_theads_rm_theads(List * t, int k, List * t_heads) {
+static void lrk_theads_rm_theads(List * t, int k, List * t_heads)
+{
   Object_item * o, * o_prev;
   int len;
   
@@ -1073,7 +1119,8 @@ static void lrk_theads_rm_theads(List * t, int k, List * t_heads) {
  * Find theads of length k for string alpha.
  * This is a set of strings.
  */
-List * lrk_theads(SymbolList alpha, int k) {
+List * lrk_theads(SymbolList alpha, int k)
+{
   int j;
   SymbolList s;
   List * t;
@@ -1105,4 +1152,3 @@ List * lrk_theads(SymbolList alpha, int k) {
 //////////////////////////////////////////////////////////////////
 // Functions for LR(k) theads. END.
 //////////////////////////////////////////////////////////////////
-

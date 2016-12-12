@@ -57,7 +57,8 @@ static int ups_count = 0;
  * sort an integer array increasingly.
  * Uses insertion sort.
  */
-void sort_int(int array[], int array_len) {
+void sort_int(int array[], int array_len)
+{
   register int i, j, tmp;
   for (i = 1; i < array_len; i ++) {
     tmp = array[i];
@@ -69,7 +70,8 @@ void sort_int(int array[], int array_len) {
 }
 
 
-void print_int_array(int a[], int count) {
+void print_int_array(int a[], int count)
+{
   int i;
   yyprintf2("count = %d\n", count);
   for (i = 0; i < count; i ++) {
@@ -109,7 +111,8 @@ void print_int_array(int a[], int count) {
  */
 void getUnitProdShift(int state, SymbolTblNode * leaf,
        MRParents * parents, 
-       int unitProdDestStates[], int * unitProdCount) {
+       int unitProdDestStates[], int * unitProdCount)
+{
 
   //printf("getUnitProdShift for '%s'\n", leaf);
   int i;
@@ -144,7 +147,8 @@ void getUnitProdShift(int state, SymbolTblNode * leaf,
 
 void writeUnitProdShift(int state, SymbolTblNode * leaf,
      int unitProdDestStates[], int unitProdCount, 
-     int new_ups_state) {
+     int new_ups_state)
+{
   int i;
   yyprintf3("state %d, leaf '%s' -", state, leaf->symbol);
   yyprintf2(" combine these states to new state %d:\n",
@@ -157,7 +161,8 @@ void writeUnitProdShift(int state, SymbolTblNode * leaf,
 }
 
 
-void checkUPSSize() {
+void checkUPSSize()
+{
   if (ups_count < UPS_SIZE) return;
 
   //yyprintf2("checkUPSSize: max size %d reached\n", UPS_SIZE);
@@ -178,7 +183,8 @@ void checkUPSSize() {
 }
 
 
-void writeUPSState(UnitProdState * ups) {
+void writeUPSState(UnitProdState * ups)
+{
   yyprintf2("State no: %d. Is combination of these states:\n", 
           ups->state_no);
   print_int_array(ups->combined_states, 
@@ -186,7 +192,8 @@ void writeUPSState(UnitProdState * ups) {
 }
 
 
-void writeUPSStates() {
+void writeUPSStates()
+{
   int i;
   yyprintf("==New states for unit production removal");
   yyprintf2(" (total %d):\n", ups_count);
@@ -197,7 +204,8 @@ void writeUPSStates() {
 
 
 void createNewUPSState(int new_state, int old_states[], 
-                       int old_states_count) {
+                       int old_states_count)
+{
   int i;
   UnitProdState * new_ups;
 
@@ -223,7 +231,8 @@ void createNewUPSState(int new_state, int old_states[],
 }
 
 
-BOOL isSameUPSState(int a[], int b[], int count) {
+BOOL isSameUPSState(int a[], int b[], int count)
+{
   int i;
   for (i = 0; i < count; i ++) {
     if (a[i] != b[i]) return FALSE;
@@ -237,7 +246,8 @@ BOOL isSameUPSState(int a[], int b[], int count) {
  * Return: 
  *   state no. if found, or -1 if not found.
  */
-int getUPSState(int a[], int count) {
+int getUPSState(int a[], int count)
+{
   int i;
   if (ups_count == 0) return -1;
 
@@ -251,7 +261,8 @@ int getUPSState(int a[], int count) {
 }
 
 
-BOOL isUnitProduction(int rule_no) {
+BOOL isUnitProduction(int rule_no)
+{
   if (rule_no >= grammar.rule_count) {
     printf("isUnitProduction error: ");
     printf("array index (%d) out of bound\n", rule_no);
@@ -269,7 +280,8 @@ BOOL isUnitProduction(int rule_no) {
  * Called by function insertActionsOfCombinedStates().
  */
 void insertActionOfSymbol(SymbolTblNode * symbol, int new_state,
-       int old_state_index, int old_states[]) {
+       int old_state_index, int old_states[])
+{
 
   char action = 0;
   int state_dest = 0;
@@ -303,7 +315,8 @@ void insertActionOfSymbol(SymbolTblNode * symbol, int new_state,
  * Called by remove_unit_production_step1and2() only.
  */
 void insertActionsOfCombinedStates(int new_state, int src_state,
-   int old_states[], int old_states_count) {
+   int old_states[], int old_states_count)
+{
 
   //printf("Source state: %d. ", src_state);
   //printf("Combine these states into state %d:\n", new_state);
@@ -346,7 +359,8 @@ void insertActionsOfCombinedStates(int new_state, int src_state,
  * parent symbols we can ignore to output them in the
  * step writeFinalParsingTable!
  */
-void remove_unit_production_step3() {
+void remove_unit_production_step3()
+{
   SymbolNode * a;
   int i;
 
@@ -366,7 +380,8 @@ void remove_unit_production_step3() {
  * Check if n is in integer array a.
  * Returns TRUE if exists, FALSE if not exists.
  */
-BOOL inIntArray(int n, int a[], int a_size) {
+BOOL inIntArray(int n, int a[], int a_size)
+{
   int i;
   for (i = 0; i < a_size; i ++) {
     if (n == a[i]) return TRUE;
@@ -382,7 +397,8 @@ BOOL inIntArray(int n, int a[], int a_size) {
  * include checking for 'g' for all three situations.
  */
 void getReachableStatesForSymbol(char * symbol, int cur_state,
-  int states_reachable[], int * states_count) {
+  int states_reachable[], int * states_count)
+{
   char action;
   int state_dest;
 
@@ -406,7 +422,8 @@ void getReachableStatesForSymbol(char * symbol, int cur_state,
  * states_reachable[].
  */
 void getReachableStates(int cur_state, int states_reachable[],
-    int * states_count) {
+    int * states_count)
+{
   SymbolNode * a;
 
   getReachableStatesForSymbol(strEnd, 
@@ -426,7 +443,8 @@ void getReachableStates(int cur_state, int states_reachable[],
 }
 
 
-void writeParsingTableColHeader() {
+void writeParsingTableColHeader()
+{
   int i;
   for (i = 0; i < ParsingTblCols; i ++) {
     if (isGoalSymbol(ParsingTblColHdr[i]) == FALSE) {
@@ -441,7 +459,8 @@ void writeParsingTableColHeader() {
  * get final parsing table column headers.
  * + 1 for end marker strEnd.
  */
-void getF_ParsingTblColHdr() {
+void getF_ParsingTblColHdr()
+{
   SymbolNode * a, * tail;
 
   tail = F_ParsingTblColHdr = createSymbolNode(hashTbl_find(strEnd));
@@ -465,7 +484,8 @@ void getF_ParsingTblColHdr() {
 }
 
 
-void writeFinalParsingTableColHeader() {
+void writeFinalParsingTableColHeader()
+{
   SymbolNode * a;
   for (a = F_ParsingTblColHdr; a != NULL; a = a->next) {
     yyprintf2("%s\t", a->snode->symbol);
@@ -483,7 +503,8 @@ void writeFinalParsingTableColHeader() {
  * int * states_reachable and int states_reachable_count
  * are defined in y.h.
  */
-void remove_unit_production_step4() {
+void remove_unit_production_step4()
+{
   states_reachable = (int *) malloc(sizeof(int) * ParsingTblRows);
   if (states_reachable == NULL) {
     YYERR_EXIT("remove_unit_productino_step4 error: out of memory\n");
@@ -503,7 +524,8 @@ void remove_unit_production_step4() {
 }
 
 
-BOOL isReachableState(int state) {
+BOOL isReachableState(int state)
+{
   if (state == 0 || inIntArray(state, states_reachable,
                     states_reachable_count) == TRUE) {
     return TRUE;
@@ -516,7 +538,8 @@ BOOL isReachableState(int state) {
  * The parsing table array does not change,
  * only change the output entries.
  */
-void printFinalParsingTable() {
+void printFinalParsingTable()
+{
   SymbolTblNode * n;
   int row, col;
   int col_size = ParsingTblCols;
@@ -548,7 +571,8 @@ void printFinalParsingTable() {
 }
 
 
-void printIntArray(int a[], int a_ct) {
+void printIntArray(int a[], int a_ct)
+{
   int i;
   for (i = 0; i < a_ct; i ++) {
     yyprintf2("%d", a[i]);
@@ -577,7 +601,8 @@ void printIntArray(int a[], int a_ct) {
  * int actual_state_no_ct;
  */
 
-void get_actual_state_no() {
+void get_actual_state_no()
+{
   int row, i;
   int row_size = ParsingTblRows;
   actual_state_no = (int *) malloc(sizeof(int) * 2 * row_size);
@@ -600,7 +625,8 @@ void get_actual_state_no() {
 }
 
 
-int getActualState(int virtual_state) {
+int getActualState(int virtual_state)
+{
   int i;
   for (i = 0; i < actual_state_no_ct; i += 2) {
     if (virtual_state == actual_state_no[i])
@@ -610,7 +636,8 @@ int getActualState(int virtual_state) {
 }
 
 
-void writeActualStateArray() {
+void writeActualStateArray()
+{
   int i;
   
   if (USE_REMOVE_UNIT_PRODUCTION == FALSE) return;
@@ -628,7 +655,8 @@ void writeActualStateArray() {
  * If an action is 's' or 'g', change its target state number
  * from virtual to actual.
  */
-void printCondensedFinalParsingTable() {
+void printCondensedFinalParsingTable()
+{
   SymbolTblNode * n;
   char action;
   int row, col, i, state_no;
@@ -668,7 +696,8 @@ void printCondensedFinalParsingTable() {
  * Because all we care in x -> a b c
  * is how many symbols we have on the RHS.
  */
-void remove_unit_production_step5() {
+void remove_unit_production_step5()
+{
   int i, index;
   int ct = getGrammarRuleCount();
   
@@ -684,7 +713,8 @@ void remove_unit_production_step5() {
 }
 
 
-void remove_unit_production_step1and2() {
+void remove_unit_production_step1and2()
+{
   int state, i, unitProdCount, ups_state;
   SymbolTblNode * leaf;
   MRParents * parents; 
@@ -767,7 +797,8 @@ void remove_unit_production_step1and2() {
 ////////////////////////////////////////////////////////
 // Dr. Pager, Acta Informatica 9, 31-59 (1977), page 38.
 ////////////////////////////////////////////////////////
-void remove_unit_production() {
+void remove_unit_production()
+{
   buildMultirootedTree();
 
   remove_unit_production_step1and2();
@@ -790,7 +821,8 @@ void remove_unit_production() {
 /*
  * Determine if rows i and j in the parsing table are the same.
  */
-BOOL isEqualRow(int i, int j) {
+BOOL isEqualRow(int i, int j)
+{
   int col;
   char action_i, action_j;
   int state_dest_i, state_dest_j;
@@ -812,7 +844,8 @@ BOOL isEqualRow(int i, int j) {
  * In parsing table row, replace entries whose
  * target state is old_state by new_state.
  */
-void updateRepeatedRow(int new_state, int old_state, int row) {
+void updateRepeatedRow(int new_state, int old_state, int row)
+{
   SymbolNode * a;
   SymbolTblNode * n;
   char action;
@@ -849,7 +882,8 @@ void updateRepeatedRow(int new_state, int old_state, int row) {
  * states, to save time), replace those entries
  * whose target state is old_state by new_state.
  */
-void updateRepeatedRows(int new_state, int old_state) {
+void updateRepeatedRows(int new_state, int old_state)
+{
   int i;
 
   updateRepeatedRow(new_state, old_state, 0); // row 0.
@@ -862,7 +896,8 @@ void updateRepeatedRows(int new_state, int old_state) {
 /*
  * Remove state i from the array of reachable states.
  */
-void removeReachableState(int i) {
+void removeReachableState(int i)
+{
   for (; i < states_reachable_count - 1; i ++) {
     states_reachable[i] = states_reachable[i + 1];
   }
@@ -887,7 +922,8 @@ void removeReachableState(int i) {
  * Maybe should use the safer way, to use a double loop.
  * It's O(n^2) anyway.
  */
-void furtherOptimization() {
+void furtherOptimization()
+{
   int i, j, k;
   //n_state_opt12 = states_reachable_count + 1;
 
@@ -919,4 +955,3 @@ void furtherOptimization() {
 /////////////////////////////////////////////////////
 // Functions for further optimization. End.
 /////////////////////////////////////////////////////
-

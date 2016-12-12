@@ -40,7 +40,8 @@ static BOOL ERR_NO_OUTFILE_NAME = FALSE;
 static BOOL ERR_NO_FILENAME_PREFIX = FALSE;
 
 
-void show_helpmsg_exit() {
+void show_helpmsg_exit()
+{
   if (ERR_NO_INPUT_FILE) {
     printf("no input file\n");
   }
@@ -79,7 +80,8 @@ void show_helpmsg_exit() {
  * Get output file name if -o or --outfile-name==
  * switches are used.
  */
-void get_outfile_name(int len, char * name) {
+void get_outfile_name(int len, char * name)
+{
   if (len <= 0 || strlen(name) == 0) {
     ERR_NO_OUTFILE_NAME = TRUE;
     show_helpmsg_exit();
@@ -100,7 +102,8 @@ void get_outfile_name(int len, char * name) {
  * Get output file name if -b or --file_prefix==
  * switches are used.
  */
-void get_filename_prefix(int len, char * name) {
+void get_filename_prefix(int len, char * name)
+{
   if (len <= 0 || strlen(name) == 0) {
     ERR_NO_OUTFILE_NAME = TRUE;
     show_helpmsg_exit();
@@ -117,12 +120,14 @@ void get_filename_prefix(int len, char * name) {
 }
 
 
-void write_options(int infile_index, char ** argv) {
+void write_options(int infile_index, char ** argv)
+{
   //exit(0);
 }
 
 
-void init_options() {
+void init_options()
+{
   USE_COMBINE_COMPATIBLE_CONFIG = TRUE;
 
   // default: -O1
@@ -168,13 +173,15 @@ void init_options() {
 }
 
 
-void set_lalr1() {
+void set_lalr1()
+{
   USE_LALR = TRUE;
   USE_LR0 = TRUE;
 }
 
 
-void set_lr0() {
+void set_lr0()
+{
   USE_LR0 = TRUE;
 }
 
@@ -182,7 +189,8 @@ void set_lr0() {
 /*
  * Use PGM to combine states in the end.
  */
-void set_lane_tracing_pgm() {
+void set_lane_tracing_pgm()
+{
   USE_LANE_TRACING = TRUE;
   USE_LALR = TRUE;
   USE_LR0 = TRUE;
@@ -193,7 +201,8 @@ void set_lane_tracing_pgm() {
 /*
  * Use the other (lane-based) method to combine states in the end.
  */
-void set_lane_tracing_ltt() {
+void set_lane_tracing_ltt()
+{
   USE_LANE_TRACING = TRUE;
   USE_LALR = TRUE;
   USE_LR0 = TRUE;
@@ -204,13 +213,15 @@ void set_lane_tracing_ltt() {
 /*
  * -P plus LR(k).
  */
-void set_lr_k() {
+void set_lr_k()
+{
   set_lane_tracing_ltt();
   USE_LR_K = TRUE;
 }
 
 
-void get_single_letter_option(char * s, unsigned int pos) {
+void get_single_letter_option(char * s, unsigned int pos)
+{
   int switch_param = -1;
   int c = s[pos];
 
@@ -388,7 +399,8 @@ void get_single_letter_option(char * s, unsigned int pos) {
 }
 
 
-void get_mnemonic_long_option(char * s) {
+void get_mnemonic_long_option(char * s)
+{
   if (strcmp(s, "--debug") == 0) { // -t
     USE_YYDEBUG = TRUE;
   } else if (strcmp(s, "--defines") == 0) { // -d
@@ -443,7 +455,8 @@ void get_mnemonic_long_option(char * s) {
  *   optimization 2: remove unit productions after 1.
  *   optimization 3: further remove repeated states after 2.
  */
-int get_options(int argc, char ** argv) {
+int get_options(int argc, char ** argv)
+{
   int i, pos, len;
   int infile_index = -1;
 
@@ -492,4 +505,3 @@ int get_options(int argc, char ** argv) {
   write_options(infile_index, argv);
   return infile_index;
 }
-

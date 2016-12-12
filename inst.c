@@ -42,13 +42,14 @@ static char * s1 =
  * This file is updated each time hyacc is installed.\n\
  */\n\n\
 #include \"y.h\"\n\n\
-void show_manpage() {\n \
+void show_manpage()\n\
+{\n\
   system(\"less ";
 
 static char * s2 = 
 "/lib/hyacc/hyaccmanpage\");\n\
 }\n\n\
-char * HYACC_PATH = \n  \
+char * HYACC_PATH = \n\
 \"";
 
 static char * s3 = "/lib/hyacc/hyaccpar\";\n\n";

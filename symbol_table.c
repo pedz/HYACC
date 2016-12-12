@@ -39,7 +39,8 @@
  *******************************************/
 
 
-RuleIDNode * createRuleIDNode(int ruleID) {
+RuleIDNode * createRuleIDNode(int ruleID)
+{
   RuleIDNode * r;
   r = (RuleIDNode *) malloc(sizeof(RuleIDNode));
   if (r == NULL) 
@@ -51,7 +52,8 @@ RuleIDNode * createRuleIDNode(int ruleID) {
 }
 
 
-void writeRuleIDList(SymbolTblNode * n) {
+void writeRuleIDList(SymbolTblNode * n)
+{
   RuleIDNode * a;
   printf("%s: ", n->symbol);
   if ((a = n->ruleIDList) != NULL) {
@@ -65,7 +67,8 @@ void writeRuleIDList(SymbolTblNode * n) {
 }
 
 
-void writeNonTerminalRuleIDList() {
+void writeNonTerminalRuleIDList()
+{
   SymbolNode * a;
   int count = 0;
   printf("--Nonterminal symbol rule index list--\n");
@@ -76,7 +79,8 @@ void writeNonTerminalRuleIDList() {
 }
 
 
-void destroyRuleIDList(RuleIDNode * r) {
+void destroyRuleIDList(RuleIDNode * r)
+{
   RuleIDNode * a, * b;
 
   if (r == NULL) return;
@@ -98,7 +102,8 @@ void destroyRuleIDList(RuleIDNode * r) {
 /*
  * Create a symbol node, used by Production, Context etc.
  */
-SymbolNode * createSymbolNode(SymbolTblNode * sn) {
+SymbolNode * createSymbolNode(SymbolTblNode * sn)
+{
   SymbolNode * n;
 
   if (sn == NULL) 
@@ -113,13 +118,15 @@ SymbolNode * createSymbolNode(SymbolTblNode * sn) {
 }
 
 
-void freeSymbolNode(SymbolNode * n) {
+void freeSymbolNode(SymbolNode * n)
+{
   if (n == NULL) return;
   free(n);
 }
 
 
-void freeSymbolNodeList(SymbolNode * a) {
+void freeSymbolNodeList(SymbolNode * a)
+{
   SymbolNode * b;
   if (a == NULL) return;
 
@@ -131,7 +138,8 @@ void freeSymbolNodeList(SymbolNode * a) {
 }
 
 
-SymbolNode * findInSymbolList(SymbolList a, SymbolTblNode * s) {
+SymbolNode * findInSymbolList(SymbolList a, SymbolTblNode * s)
+{
   SymbolNode * b;
 
   for (b = a; b != NULL; b = b->next) {
@@ -142,7 +150,8 @@ SymbolNode * findInSymbolList(SymbolList a, SymbolTblNode * s) {
 }
 
 
-int getSymbolListLen(SymbolList a) {
+int getSymbolListLen(SymbolList a)
+{
   int len;
   SymbolNode * b;
 
@@ -155,7 +164,8 @@ int getSymbolListLen(SymbolList a) {
 /*
  * Given a symbol list a, returns a clone of it.
  */
-SymbolList cloneSymbolList(const SymbolList a) {
+SymbolList cloneSymbolList(const SymbolList a)
+{
   SymbolNode * b, *c, * clone;
   if (NULL == a) return NULL;
 
@@ -173,7 +183,8 @@ SymbolList cloneSymbolList(const SymbolList a) {
  * @return: the new list.
  */
 SymbolList removeFromSymbolList(
-    SymbolList a, SymbolTblNode * s, int * exist) {
+    SymbolList a, SymbolTblNode * s, int * exist)
+{
   SymbolNode * b, * tmp;
   * exist = 1;
 
@@ -202,7 +213,8 @@ SymbolList removeFromSymbolList(
 /*
  * Find in a sorted (INCREMENTAL) list.
  */
-SymbolNode * findInIncSymbolList(SymbolList a, SymbolTblNode * s) {
+SymbolNode * findInIncSymbolList(SymbolList a, SymbolTblNode * s)
+{
   SymbolNode * b;
 
   for (b = a; b != NULL; b = b->next) {
@@ -220,7 +232,8 @@ SymbolNode * findInIncSymbolList(SymbolList a, SymbolTblNode * s) {
  * Insert symbol n into INC list a.
  * @Return: the result list.
  */
-SymbolNode * insertIncSymbolList(SymbolList a, SymbolTblNode * n) {
+SymbolNode * insertIncSymbolList(SymbolList a, SymbolTblNode * n)
+{
   int cmp;
   SymbolNode * b, * b_prev;
   if (NULL == n) return a;
@@ -257,7 +270,8 @@ SymbolNode * insertIncSymbolList(SymbolList a, SymbolTblNode * n) {
  * Returns the head of the combined list.
  * This can be used when combining contexts.
  */
-SymbolNode * combineIncSymbolList(SymbolList a, SymbolList b) {
+SymbolNode * combineIncSymbolList(SymbolList a, SymbolList b)
+{
   SymbolNode * na, * nb, * na_prev;
   int cmp;
   if (a == NULL) return cloneSymbolList(b);
@@ -303,7 +317,8 @@ SymbolNode * combineIncSymbolList(SymbolList a, SymbolList b) {
 }
 
 
-void writeSymbolList(SymbolList a, char * name) {
+void writeSymbolList(SymbolList a, char * name)
+{
   SymbolNode * b = a;
   if (name != NULL) printf("%s: ", name);
   if (b != NULL) {
@@ -323,7 +338,8 @@ void writeSymbolList(SymbolList a, char * name) {
 /*
  * create a symbol table node, used by hash table HashTbl.
  */
-SymbolTblNode * createSymbolTblNode(char * symbol) {
+SymbolTblNode * createSymbolTblNode(char * symbol)
+{
   SymbolTblNode * n;
 
   if (symbol == NULL) 
@@ -348,14 +364,16 @@ SymbolTblNode * createSymbolTblNode(char * symbol) {
 /*
  * Empty string and EOF '$' are _NEITHER type.
  */
-static char * getSymbolType(SymbolTblNode * n) {
+static char * getSymbolType(SymbolTblNode * n)
+{
   if (n->type == _TERMINAL) return "T";
   if (n->type == _NONTERMINAL) return "NT";
   return "-";
 }
 
 
-static char * getAssocName(associativity a) {
+static char * getAssocName(associativity a)
+{
   if (a == _LEFT) return "left";
   if (a == _RIGHT) return "right";
   if (a == _NONASSOC) return "none";
@@ -367,7 +385,8 @@ static char * getAssocName(associativity a) {
  * Hash table functions.
  *******************************************/
 
-void testHashTbl() {
+void testHashTbl()
+{
   hashTbl_insert("xin");
   hashTbl_insert("abe");
   hashTbl_insert("xin");
@@ -384,7 +403,8 @@ void testHashTbl() {
 }
 
 
-void hashTbl_init() {
+void hashTbl_init()
+{
   int i;
   for (i = 0; i < HT_SIZE; i ++) {
     HashTbl[i].count = 0;
@@ -402,7 +422,8 @@ void hashTbl_init() {
  * Assumption: symbol != NULL.
  * empty string is allowed.
  */
-static int hash_value(char * symbol) {
+static int hash_value(char * symbol)
+{
   int i, sum;
   int len = strlen(symbol);
 
@@ -428,7 +449,8 @@ static int hash_value(char * symbol) {
  * this function to ensure getting a node contains 
  * this symbol.
  */
-SymbolTblNode * hashTbl_insert(char * symbol) {
+SymbolTblNode * hashTbl_insert(char * symbol)
+{
   int v;
   SymbolTblNode * n;
 
@@ -469,7 +491,8 @@ SymbolTblNode * hashTbl_insert(char * symbol) {
  * Return the node for symbol.
  * If symbol does not exist, return NULL.
  */
-SymbolTblNode * hashTbl_find(char * symbol) {
+SymbolTblNode * hashTbl_find(char * symbol)
+{
   int v;
   SymbolTblNode * n;
 
@@ -493,7 +516,8 @@ SymbolTblNode * hashTbl_find(char * symbol) {
 }
 
 
-void hashTbl_destroy() {
+void hashTbl_destroy()
+{
   int i;
   SymbolTblNode * n, * nnext;
 
@@ -512,7 +536,8 @@ void hashTbl_destroy() {
 }
 
 
-void SymbolTblNode_dump(SymbolTblNode * n) {
+void SymbolTblNode_dump(SymbolTblNode * n)
+{
   yyprintf6("%s [type=%s,vanish=%s,seq=%d,val=%d", 
             n->symbol, getSymbolType(n), 
             (n->vanishable == 1) ? "T" : "F", 
@@ -525,7 +550,8 @@ void SymbolTblNode_dump(SymbolTblNode * n) {
 }
 
 
-void hashTbl_dump() {
+void hashTbl_dump()
+{
   int i, count = 0, list_count = 0;
   SymbolTblNode * n;
 
@@ -555,5 +581,3 @@ void hashTbl_dump() {
 
   //hashTbl_destroy();
 }
-
-

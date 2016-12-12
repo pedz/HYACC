@@ -36,6 +36,7 @@ The parser engines hyaccpar and hyaccpark use BSD license. \n\
 See the source for license information.\
 ";
 
-void print_version() {
+void print_version()
+{
   printf("%s\n", HYACC_VERSION);
 }

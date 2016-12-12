@@ -81,7 +81,8 @@ YYSTYPE yyval;  /* "$$" used in production action. */
 #if YYDEBUG
 
 /* get token name from value of yychar. */
-char * yyget_tok(const int yychar) {
+char * yyget_tok(const int yychar)
+{
   static char c[1];
   int i;
   if (yychar == YYEOF) return "EOF";
@@ -98,7 +99,8 @@ char * yyget_tok(const int yychar) {
   return "-none-";
 }
 
-void yywrite_stack() { 
+void yywrite_stack()
+{ 
   int i; 
   /* It's unknown what data type yypv is, so can't write here. */ 
   /* The user can customize the code here himself. */ 
@@ -181,7 +183,8 @@ void yywrite_stack() {
  * state: yystate. lookahead: yychar.
  * return: 0 if success, -1 if fail, 1 if eat a token.
  */
-int yyerror_handler(int yystate) {
+int yyerror_handler(int yystate)
+{
   int yyaction;
   switch (yyerrflag) {
     case 0:
@@ -251,11 +254,11 @@ int yyerror_handler(int yystate) {
   } /* end of switch. */
 } /* end of yyerror_handler(). */
 
-
 /*
  * yyparse - return 0 if succeeds, 1 if anything goes wrong.
  */
-int yyparse() {
+int yyparse()
+{
   YYSTYPE * yypvt;    /* top of value stack for $vars. */
   int yystate, yyaction = -1, yy_lhs, yy_rhs_ct, yyerr_hdl;
   yynerrs = yyerrflag = 0;
@@ -399,6 +402,3 @@ int yyparse() {
   if (yyerr_hdl == -1) YYABORT;
   else YYACCEPT;
 } /* end of yyparse */
-
-
-

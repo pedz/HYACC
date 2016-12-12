@@ -53,4 +53,3 @@ void stack_destroy(stack * s);
 void stack_dump(stack * s); 
 
 #endif
-

@@ -52,7 +52,8 @@
 
 #if USE_CUR_DIR
 
-void show_manpage() {
+void show_manpage()
+{
    system("more hyaccmanpage");
 }
 
@@ -60,12 +61,11 @@ char * HYACC_PATH = "hyaccpar";
 
 #else
 
-void show_manpage() {
+void show_manpage()
+{
    system("more c:\\windows\\hyaccmanpage");
 }
 
 char * HYACC_PATH = "c:\\windows\\hyaccpar";
 
 #endif
-
-

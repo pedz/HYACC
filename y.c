@@ -82,7 +82,8 @@ int getGrammarRuleCount() { return grammar.rule_count; }
  * For StateList. Start.
  */
 
-StateList * StateList_create() {
+StateList * StateList_create()
+{
   StateList * L;
   HYY_NEW(L, StateList, 1);
 
@@ -93,14 +94,16 @@ StateList * StateList_create() {
   return L;
 }
 
-void StateList_destroy(StateList * L) {
+void StateList_destroy(StateList * L)
+{
   if (NULL == L || NULL == L->state_list) return;
   free(L->state_list);
   free(L);
 }
 
 
-void StateList_expand(StateList * L) {
+void StateList_expand(StateList * L)
+{
   if (NULL == L) return;
   HYY_EXPAND(L->state_list, State *, L->size * 2);
   L->size *= 2;
@@ -110,7 +113,8 @@ void StateList_expand(StateList * L) {
  * Add if not exist yet.
  * @Return: TRUE is added, FALSE if not added.
  */
-BOOL StateList_add(StateList * L, State * s) {
+BOOL StateList_add(StateList * L, State * s)
+{
   int i;
   if (L == NULL) {
     YYERR_EXIT("StateList_add error: L is NULL\n");
@@ -133,7 +137,8 @@ BOOL StateList_add(StateList * L, State * s) {
 /*
  * Called by cloneState() in lane_tracing.c.
  */
-StateList * StateList_clone(StateList * L0) {
+StateList * StateList_clone(StateList * L0)
+{
   StateList * L;
   int i;
 
@@ -152,7 +157,8 @@ StateList * StateList_clone(StateList * L0) {
   return L;
 }
 
-void StateList_write(StateList * L) {
+void StateList_write(StateList * L)
+{
   int i;
 
   if (L == NULL) return;
@@ -178,7 +184,8 @@ void StateList_write(StateList * L) {
  * In general, marker == -1 only when print grammar rules.
  * marker >= 0 when print configuration production.
  */
-void writeProduction(Production * p, int marker) {
+void writeProduction(Production * p, int marker)
+{
   int i;
   SymbolNode * n;
 
@@ -215,7 +222,8 @@ void writeProduction(Production * p, int marker) {
 /*
  * Write rules of the given grammar.
  */
-void writeGrammarRules(Grammar * g) {
+void writeGrammarRules(Grammar * g)
+{
   int i;
   int count = 0;
   yyprintf("Rules: \n");
@@ -234,7 +242,8 @@ void writeGrammarRules(Grammar * g) {
  * The goal production is always printed no matter
  * it is a unit production or not.
  */
-void writeGrammarRulesNoUnitProd(Grammar * g) {
+void writeGrammarRulesNoUnitProd(Grammar * g)
+{
   int i;
   int count = 0;
   yyprintf("Rules: \n");
@@ -252,7 +261,8 @@ void writeGrammarRulesNoUnitProd(Grammar * g) {
 /*
  * Returns number of rules excluding unit productions.
  */
-int getOptRuleCount(Grammar * g) {
+int getOptRuleCount(Grammar * g)
+{
   int i;
   int count = 0;
   for (i = 0; i < g->rule_count; i ++) {
@@ -266,7 +276,8 @@ int getOptRuleCount(Grammar * g) {
 /*
  * Write terminals of the given grammar.
  */
-void writeTerminals(Grammar * g) {
+void writeTerminals(Grammar * g)
+{
   SymbolNode * a;
   yyprintf2("Terminals (%d): \n", g->terminal_count);
 
@@ -290,7 +301,8 @@ void writeTerminals(Grammar * g) {
  * is just to keep consistent with yacc. 
  * Leave this out for now.
  */
-void writeNonTerminals(Grammar * g) {
+void writeNonTerminals(Grammar * g)
+{
   SymbolNode * a;
   yyprintf2("Non-terminals (%d): \n", g->non_terminal_count);
 
@@ -306,7 +318,8 @@ void writeNonTerminals(Grammar * g) {
 }
 
 
-void writeVanishSymbols(Grammar * g) {
+void writeVanishSymbols(Grammar * g)
+{
   SymbolNode * a;
 
   yyprintf2("Vanish symbols (%d): \n",
@@ -328,7 +341,8 @@ void writeVanishSymbols(Grammar * g) {
  * Write the given grammar, including its terminals,
  * non-terminals, goal symbol and rules.
  */
-void writeGrammar(Grammar * g, BOOL beforeRmUnitProd) {
+void writeGrammar(Grammar * g, BOOL beforeRmUnitProd)
+{
   yyprintf("\n--Grammar--\n");
   writeTerminals(g);
   writeNonTerminals(g);
@@ -349,7 +363,8 @@ void writeGrammar(Grammar * g, BOOL beforeRmUnitProd) {
  * Free variables dynamically allocated by the program.
  * Called by function main().
  */
-void free_vars() {
+void free_vars()
+{
   int i;
   // free dynamically allocated variables in grammar.
   for (i = 0; i < grammar.rule_count; i ++) {
@@ -372,7 +387,8 @@ void free_vars() {
 }
 
 
-State_array * createStateArray() {
+State_array * createStateArray()
+{
   int i;
   State_array * s;
   HYY_NEW(s, State_array, 1);
@@ -395,7 +411,8 @@ State_array * createStateArray() {
 /*
  * Called by expandParsingTable() only.
  */
-void expandStateArray(State_array * a, int new_size) {
+void expandStateArray(State_array * a, int new_size)
+{
   int i;
   HYY_EXPAND(a->state_list, State *, new_size);
 
@@ -414,14 +431,16 @@ void expandStateArray(State_array * a, int new_size) {
 }
 
 
-void addStateToStateArray(State_array * a, State * s) {
+void addStateToStateArray(State_array * a, State * s)
+{
   a->state_list[a->state_count] = s;
   a->state_count ++;
 }
 
 
 Conflict * createConflictNode(int state, SymbolTblNode * lookahead,
-                          int r, int s) {
+                          int r, int s)
+{
   Conflict * c;
   HYY_NEW(c, Conflict, 1);
   c->state = state;
@@ -433,12 +452,14 @@ Conflict * createConflictNode(int state, SymbolTblNode * lookahead,
 }
 
 
-void destroyConflictNode(Conflict * c) {
+void destroyConflictNode(Conflict * c)
+{
   free(c);
 }
 
 
-void destroyConflictList(Conflict * a) {
+void destroyConflictList(Conflict * a)
+{
   Conflict * b;
   if (a == NULL) return;
 
@@ -450,7 +471,8 @@ void destroyConflictList(Conflict * a) {
 }
 
 
-void incConflictCount(int s, int state) {
+void incConflictCount(int s, int state)
+{
   if (s > 0) {
     rs_count ++;
     states_new_array->rs_count[state] ++;
@@ -468,7 +490,8 @@ void incConflictCount(int s, int state) {
  * which is handled in expandParsingTable().
  */
 Conflict * addToConflictArray(int state, SymbolTblNode * lookahead,
-                              int action1, int action2) {
+                              int action1, int action2)
+{
   int r, s; // r < s
   Conflict * c = NULL, * b, * b_prev = NULL;
 
@@ -515,7 +538,8 @@ Conflict * addToConflictArray(int state, SymbolTblNode * lookahead,
  * Initialize variables when the program starts.
  * Called by function main().
  */
-void init() {
+void init()
+{
   states_new = createStateCollection();
   states_new_array = createStateArray(); // size == PARSING_TABLE_SIZE
 
@@ -537,7 +561,8 @@ void init() {
 }
 
 
-void writeContext(Context * c) {
+void writeContext(Context * c)
+{
   SymbolNode * s;
 
   yyprintf(" {");
@@ -568,7 +593,8 @@ void writeContext(Context * c) {
 }
 
 
-void writeConfiguration(Configuration * c) {
+void writeConfiguration(Configuration * c)
+{
   if (c == NULL) {
     //printf("writeConfiguration warning: c is NULL\n");
     return;
@@ -599,7 +625,8 @@ void writeConfiguration(Configuration * c) {
 }
 
 
-void writeCoreConfiguration(State * s) {
+void writeCoreConfiguration(State * s)
+{
   int i;
   yyprintf("~~~~~Core configurations.Start~~~~~\n");
   for (i = 0; i < s->core_config_count; i ++) {
@@ -609,7 +636,8 @@ void writeCoreConfiguration(State * s) {
 }
 
 
-void writeSuccessorList(State * s) {
+void writeSuccessorList(State * s)
+{
   int i;
   if (s->successor_count > 0) yyprintf("\n");
   //  yyprintf("\n-successor list-\n");
@@ -621,7 +649,8 @@ void writeSuccessorList(State * s) {
 }
 
 
-void writeStateConflictList(int state) {
+void writeStateConflictList(int state)
+{
   Conflict * c;
 
   if (USE_REMOVE_UNIT_PRODUCTION) {
@@ -649,7 +678,8 @@ void writeStateConflictList(int state) {
 }
 
 
-void writeGrammarConflictList() {
+void writeGrammarConflictList()
+{
   int i;
 
   if (rs_count == 0 && rr_count == 0) return;
@@ -682,7 +712,8 @@ void writeGrammarConflictList() {
 /*
  *  Used when USE_REMOVE_UNIT_PROD is used.
  */
-void writeGrammarConflictList2() {
+void writeGrammarConflictList2()
+{
   int i, state, diff;
   int final_rs_count = 0;
   int final_rr_count = 0;
@@ -727,7 +758,8 @@ void writeGrammarConflictList2() {
 }
 
 
-void writeState(State * s) {
+void writeState(State * s)
+{
   int i;
   if (s == NULL) {
     //printf("writeState warning: s is NULL\n");
@@ -753,7 +785,8 @@ void writeState(State * s) {
 }
 
 
-void writeStateCollection(State_collection * c) {
+void writeStateCollection(State_collection * c)
+{
   State * s;
 
   yyprintf2("==State Collection: (count=%d)\n", c->state_count);
@@ -771,7 +804,8 @@ void writeStateCollection(State_collection * c) {
 }
 
 
-void destroyState(State * s) {
+void destroyState(State * s)
+{
   int i;
   if (s == NULL) {
     //printf("destroyState warning: s is NULL\n");
@@ -799,13 +833,15 @@ void destroyState(State * s) {
  * The type was obtained when calling get_terminals() and 
  * get_nonterminals().
  */
-BOOL isNonTerminal(SymbolTblNode * s) {
+BOOL isNonTerminal(SymbolTblNode * s)
+{
   if (s->type == _NONTERMINAL) return TRUE;
   return FALSE;
 }
 
 
-BOOL isTerminal(SymbolTblNode * s) {
+BOOL isTerminal(SymbolTblNode * s)
+{
   if (s->type == _TERMINAL) return TRUE;
   return FALSE;
 }
@@ -815,7 +851,8 @@ BOOL isTerminal(SymbolTblNode * s) {
  * Add the given symbol to the context in increasing order.
  * There is no need to sort context later.
  */
-BOOL addSymbol2Context(SymbolTblNode * snode, Context * c) {
+BOOL addSymbol2Context(SymbolTblNode * snode, Context * c)
+{
   SymbolNode * s, * t, * s_prev;
   int cmp_val;
 
@@ -853,7 +890,8 @@ BOOL addSymbol2Context(SymbolTblNode * snode, Context * c) {
  *  exist - label whether snode already existed.
  */
 SymbolNode * insertSymbolList_unique_inc(
-                    SymbolList list, SymbolTblNode * snode, int * exist) {
+                    SymbolList list, SymbolTblNode * snode, int * exist)
+{
   SymbolNode * n, * n_prev, * new_node;
   * exist = 0;
 
@@ -889,7 +927,8 @@ SymbolNode * insertSymbolList_unique_inc(
  * Insert symbol to list tail if not exist, un-ordered.
  */
 SymbolNode * insertUniqueSymbolList(
-    SymbolList list, SymbolTblNode * snode, int * exist) {
+    SymbolList list, SymbolTblNode * snode, int * exist)
+{
   SymbolNode * n, * n_prev;
   * exist = 0;
 
@@ -908,7 +947,8 @@ SymbolNode * insertUniqueSymbolList(
 }
 
 
-void writeSymbolNodeArray(SymbolNode * str) {
+void writeSymbolNodeArray(SymbolNode * str)
+{
   SymbolNode * a;
   for (a = str; a != NULL; a = a->next) {
     if (a != str) yyprintf(", ");
@@ -918,7 +958,8 @@ void writeSymbolNodeArray(SymbolNode * str) {
 }
 
 
-void showTHeads(SymbolList alpha, SymbolList theads) {
+void showTHeads(SymbolList alpha, SymbolList theads)
+{
   SymbolNode * a;
 
   yyprintf("string '");
@@ -937,7 +978,8 @@ void showTHeads(SymbolList alpha, SymbolList theads) {
 
 
 void insertAlphaToHeads(SymbolNode * s, 
-    SymbolNode * heads, SymbolNode * theads) {
+    SymbolNode * heads, SymbolNode * theads)
+{
   SymbolNode * a;
   SymbolTblNode * snode;
   int exist;
@@ -970,7 +1012,8 @@ void insertAlphaToHeads(SymbolNode * s,
  * Insert the RHS symbols to heads up to an unvanishable symbol.
  */
 void insertRHSToHeads(SymbolNode * s, 
-    SymbolNode * heads, SymbolNode * theads) {
+    SymbolNode * heads, SymbolNode * theads)
+{
   SymbolNode * a;
   int exist;
 
@@ -1012,7 +1055,8 @@ void insertRHSToHeads(SymbolNode * s,
  *
  * @added to replace the old one on: 3/9/2008
  */
-SymbolNode * getTHeads(SymbolNode * alpha) {
+SymbolNode * getTHeads(SymbolNode * alpha)
+{
   SymbolNode * n, * theads, * heads;
   RuleIDNode * rules;
   Production * p;
@@ -1052,7 +1096,8 @@ SymbolNode * getTHeads(SymbolNode * alpha) {
  * Helper function for getContext().
  * This section of code is called three times.
  */
-void getContext_do(Configuration * cfg, Context * context) {
+void getContext_do(Configuration * cfg, Context * context)
+{
   SymbolNode * a = cfg->context->nContext;
   while (a != NULL) {
     addSymbol2Context(a->snode, context);
@@ -1064,7 +1109,8 @@ void getContext_do(Configuration * cfg, Context * context) {
 /*
  * Obtain the context for a configuration.
  */
-void getContext(Configuration * cfg, Context * context) {
+void getContext(Configuration * cfg, Context * context)
+{
   SymbolList alpha = NULL; // a list of symbols.
   SymbolList theads = NULL;
   SymbolNode * a;
@@ -1106,7 +1152,8 @@ void getContext(Configuration * cfg, Context * context) {
  * Empty a context. 
  * Note: if a is NULL, free(a) causes crash. 
  */
-void clearContext(Context * c) {
+void clearContext(Context * c)
+{
   if (c == NULL) return;
 
   c->context_count = 0;
@@ -1115,14 +1162,16 @@ void clearContext(Context * c) {
 }
 
 
-void freeContext(Context * c) {
+void freeContext(Context * c)
+{
   if (c == NULL) return;
   clearContext(c);
   free(c);
 }
 
 
-void clearProduction(Production * p) {
+void clearProduction(Production * p)
+{
   SymbolNode * a, * b;
   
   if (p == NULL) return;
@@ -1139,13 +1188,15 @@ void clearProduction(Production * p) {
 }
 
 
-void freeProduction(Production * p) {
+void freeProduction(Production * p)
+{
   clearProduction(p);
   free(p);
 }
 
 
-void freeConfig(Configuration * c) {
+void freeConfig(Configuration * c)
+{
   if (c == NULL) return;
   clearContext(c->context);
   free(c);
@@ -1159,7 +1210,8 @@ void freeConfig(Configuration * c) {
  * But can be used to find out if the grammar has 
  * repeated rules etc.
  */
-BOOL isSameProduction(Production * p1, Production * p2) {
+BOOL isSameProduction(Production * p1, Production * p2)
+{
   SymbolNode * a, * b;
 
   if (p1->nLHS->snode != p2->nLHS->snode) { return FALSE; }
@@ -1180,7 +1232,8 @@ BOOL isSameProduction(Production * p1, Production * p2) {
 /*
  * Determine if contexts c1 and c2 are the same.
  */
-BOOL isSameContext(Context * c1, Context * c2) {
+BOOL isSameContext(Context * c1, Context * c2)
+{
   SymbolNode * a, * b;
 
   if (c1->context_count != c2->context_count) return FALSE;
@@ -1199,7 +1252,8 @@ BOOL isSameContext(Context * c1, Context * c2) {
 /*
  * Determine if configurations con and c are the same.
  */
-BOOL isSameConfig(Configuration * con, Configuration * c) {
+BOOL isSameConfig(Configuration * con, Configuration * c)
+{
   if (con->marker != c->marker) return FALSE; 
   if (con->ruleID != c->ruleID) return FALSE;
   if (isSameContext(con->context, c->context) 
@@ -1211,7 +1265,8 @@ BOOL isSameConfig(Configuration * con, Configuration * c) {
 /*
  * Note that a successor config's marker = 0.
  */
-BOOL isExistingSuccessorConfig(State * s, int ruleID, Context * con) {
+BOOL isExistingSuccessorConfig(State * s, int ruleID, Context * con)
+{
   int i;
   Configuration * c;
   for (i = 0; i < s->config_count; i ++) {
@@ -1224,7 +1279,8 @@ BOOL isExistingSuccessorConfig(State * s, int ruleID, Context * con) {
 }
 
 
-void addSuccessorConfigToState(State * s, int ruleID, Context * con) {
+void addSuccessorConfigToState(State * s, int ruleID, Context * con)
+{
   Configuration * c;
 
   if (s->config_count >= s->config_max_count - 1) {
@@ -1246,13 +1302,15 @@ void addSuccessorConfigToState(State * s, int ruleID, Context * con) {
 }
 
 
-BOOL isFinalConfiguration(Configuration * c) {
+BOOL isFinalConfiguration(Configuration * c)
+{
   if (c->marker == grammar.rules[c->ruleID]->RHS_count) return TRUE;
   return FALSE;
 }
 
 
-BOOL isEmptyProduction(Configuration * c) {
+BOOL isEmptyProduction(Configuration * c)
+{
   if (grammar.rules[c->ruleID]->RHS_count == 0) return TRUE;
   return FALSE;
 }
@@ -1275,7 +1333,8 @@ BOOL isEmptyProduction(Configuration * c) {
  * for general config comparison, although in
  * this program it's used only here.
  */
-int config_cmp(Configuration * c1, Configuration * c2) {
+int config_cmp(Configuration * c1, Configuration * c2)
+{
   SymbolNode * a, * b;
   int cmp_val, i, count;
 
@@ -1343,7 +1402,8 @@ int config_cmp(Configuration * c1, Configuration * c2) {
  * The order is by production, and marker.
  * Assumption: a core config won't be inserted twice.
  */
-void addCoreConfig2State(State * s, Configuration * new_config) {
+void addCoreConfig2State(State * s, Configuration * new_config)
+{
   int i, j, cmp_val;
 
   if (s->config_count >= s->config_max_count - 1) {
@@ -1388,7 +1448,8 @@ void addCoreConfig2State(State * s, Configuration * new_config) {
  * Note that a successor config's marker = 0.
  * Returns the index of the compatible config in the state.
  */
-int isCompatibleSuccessorConfig(State * s, int ruleID) {
+int isCompatibleSuccessorConfig(State * s, int ruleID)
+{
   int i;
   Configuration * c;
   for (i = 0; i < s->config_count; i ++) {
@@ -1404,7 +1465,8 @@ int isCompatibleSuccessorConfig(State * s, int ruleID) {
  * Assumption: public variable config_queue contains 
  * the configurations to be processed.
  */
-void getConfigSuccessors(State * s) {
+void getConfigSuccessors(State * s)
+{
   RuleIDNode * r;
   SymbolTblNode * scanned_symbol = NULL;
   Configuration * config;
@@ -1457,7 +1519,8 @@ void getConfigSuccessors(State * s) {
 }
 
 
-void getClosure(State * s) {
+void getClosure(State * s)
+{
   int i;
   //queue_clear(config_queue);
   for (i = 0; i < s->config_count; i ++) {
@@ -1476,7 +1539,8 @@ void getClosure(State * s) {
 //////////////////////////////////////////////////////
 
 
-void getSuccessorForConfig(State * s, Configuration * config) {
+void getSuccessorForConfig(State * s, Configuration * config)
+{
   RuleIDNode * r;
   SymbolTblNode * scanned_symbol = NULL;
   static Context tmp_context;
@@ -1512,7 +1576,8 @@ void getSuccessorForConfig(State * s, Configuration * config) {
  * Compatible configurations are those that have the same
  * production and marker, but different in contexts.
  */
-void combineCompatibleConfig(State * s) {
+void combineCompatibleConfig(State * s)
+{
   int i, j;
   Configuration * c;
   if (s == NULL) {
@@ -1589,7 +1654,8 @@ int yyy, zzz;
  *         string following scanned symbol s. If thead(alpha) is
  *         empty, then use the context of current config.
  */
-void getClosure(State * s) {
+void getClosure(State * s)
+{
   int i;
 
   for (i = 0; i < s->config_count; i ++) {
@@ -1616,7 +1682,8 @@ void getClosure(State * s) {
 // State_collection functions. START.
 ///////////////////////////////////////////
 
-State_collection * createStateCollection() {
+State_collection * createStateCollection()
+{
   State_collection * c = (State_collection *)
                          malloc(sizeof(State_collection));
   if (c == NULL)
@@ -1630,7 +1697,8 @@ State_collection * createStateCollection() {
 }
 
 
-void destroyStateCollection(State_collection * c) {
+void destroyStateCollection(State_collection * c)
+{
   State * s;
   State * next;
   if (c == NULL) return;
@@ -1646,7 +1714,8 @@ void destroyStateCollection(State_collection * c) {
 }
 
 
-State * addState2Collection(State_collection * c, State * new_state) {
+State * addState2Collection(State_collection * c, State * new_state)
+{
   if (c == NULL || new_state == NULL) return NULL;
 
   new_state->next = NULL;
@@ -1673,7 +1742,8 @@ State * addState2Collection(State_collection * c, State * new_state) {
  * The scanned symbol can be obtained by nMarker pointer
  * as here, or by marker which needs more calculation.
  */
-SymbolTblNode * getScannedSymbol(Configuration * c) {
+SymbolTblNode * getScannedSymbol(Configuration * c)
+{
   if (c->nMarker == NULL) return NULL;
   return c->nMarker->snode;
 }
@@ -1685,7 +1755,8 @@ SymbolTblNode * getScannedSymbol(Configuration * c) {
  * transition following the given symbol.
  */
 State * findStateForScannedSymbol(
-        State_collection * c, SymbolTblNode * symbol) {
+        State_collection * c, SymbolTblNode * symbol)
+{
   State * s;
   if (c == NULL) return NULL;
 
@@ -1699,7 +1770,8 @@ State * findStateForScannedSymbol(
 }
 
 
-Context * createContext() {
+Context * createContext()
+{
   Context * c;
   HYY_NEW(c, Context, 1);
   c->nContext = NULL;
@@ -1710,7 +1782,8 @@ Context * createContext() {
 
 
 Configuration * createConfig(
-    int ruleID, int marker, int isCoreConfig) {
+    int ruleID, int marker, int isCoreConfig)
+{
   Configuration * c;
   c = (Configuration *) malloc(sizeof(Configuration));
   if (c == NULL) {
@@ -1744,7 +1817,8 @@ Configuration * createConfig(
 }
 
 
-void copyContext(Context * dest, Context * src) {
+void copyContext(Context * dest, Context * src)
+{
   dest->context_count = src->context_count;
  
   dest->nContext = NULL;
@@ -1763,7 +1837,8 @@ void copyContext(Context * dest, Context * src) {
  * return the copy of a config. 
  * used by function transition when creating new state.
  */
-void copyConfig(Configuration * c_dest, Configuration * c_src) {
+void copyConfig(Configuration * c_dest, Configuration * c_src)
+{
   c_dest->marker = c_src->marker;
   c_dest->isCoreConfig = c_src->isCoreConfig;
   c_dest->ruleID = c_src->ruleID;
@@ -1782,7 +1857,8 @@ void copyConfig(Configuration * c_dest, Configuration * c_src) {
  * they have the same production and marker, but
  * DIFFERENT contexts.
  */
-BOOL isCommonConfig(Configuration * con, Configuration * c) {
+BOOL isCommonConfig(Configuration * con, Configuration * c)
+{
   if (con->marker != c->marker) return FALSE;
   if (con->ruleID != c->ruleID) return FALSE;
   // If all same, then are same config, not common config!
@@ -1796,7 +1872,8 @@ BOOL isCommonConfig(Configuration * con, Configuration * c) {
  * Pre-assumption: s1, s2 have at least one core config.
  * Returns true if at least one config pair have common config.
  */
-BOOL hasCommonCore(State * s1, State * s2) {
+BOOL hasCommonCore(State * s1, State * s2)
+{
   int i;
   BOOL result;
   if (s1 == NULL || s2 == NULL) return FALSE;
@@ -1824,7 +1901,8 @@ BOOL hasCommonCore(State * s1, State * s2) {
  * Pre-assumption: contexts c1 and c2 are sorted in increasing order.
  * See function addSymbol2Context().
  */
-BOOL hasEmptyIntersection(Context * c1, Context * c2) {
+BOOL hasEmptyIntersection(Context * c1, Context * c2)
+{
   SymbolNode * a, * b;
 
   a = c1->nContext;
@@ -1849,7 +1927,8 @@ BOOL hasEmptyIntersection(Context * c1, Context * c2) {
  * condition (a).
  * if (a) is satisfied, return TRUE, otherwise FALSE.
  */
-BOOL isCompatibleState_a(State * s1, State * s2) {
+BOOL isCompatibleState_a(State * s1, State * s2)
+{
   int i, j;
   Context * c1, * c2;
   int count = s1->core_config_count;
@@ -1872,7 +1951,8 @@ BOOL isCompatibleState_a(State * s1, State * s2) {
  * condition (b) or (c).
  * if (b) or (c) is satisfied, return TRUE, otherwise FALSE.
  */
-BOOL isCompatibleState_bc(State * s) {
+BOOL isCompatibleState_bc(State * s)
+{
   int i, j;
   Context * c1, * c2;
   int count = s->core_config_count;
@@ -1893,7 +1973,8 @@ BOOL isCompatibleState_bc(State * s) {
  * Pre-assumption:
  *   s1 and s2 have at least one core configuration.
  */
-BOOL isCompatibleStates(State * s1, State * s2) {
+BOOL isCompatibleStates(State * s1, State * s2)
+{
   int count;
 
   if (hasCommonCore(s1, s2) == FALSE) return FALSE;
@@ -1913,7 +1994,8 @@ BOOL isCompatibleStates(State * s1, State * s2) {
 /*
  * Used by combineCompatibleStates() and propagateContextChange().
  */
-void updateStateParsingTblEntry(State * s) {
+void updateStateParsingTblEntry(State * s)
+{
   SymbolTblNode * scanned_symbol = NULL;
   int i;
   for (i = 0; i < s->config_count; i ++) {
@@ -1938,7 +2020,8 @@ void updateStateParsingTblEntry(State * s) {
  * - Context does not matter.
  */
 Configuration * findSimilarCoreConfig(State * t, Configuration * c,
-                                      int * config_index) {
+                                      int * config_index)
+{
   int i;
   Configuration * tmp;
 
@@ -1974,7 +2057,8 @@ Configuration * findSimilarCoreConfig(State * t, Configuration * c,
  *         propagate context change to d's successors.
  *     }
  */
-void propagateContextChange(State * s) {
+void propagateContextChange(State * s)
+{
   BOOL isChanged;
   SymbolTblNode * trans_symbol = NULL;
   Configuration * c, * d;
@@ -2031,7 +2115,8 @@ void propagateContextChange(State * s) {
  *   and are weakly compatible.
  * NOTE: s_dest is from states_new.
  */
-BOOL combineCompatibleStates(State * s_dest, State * s_src) {
+BOOL combineCompatibleStates(State * s_dest, State * s_src)
+{
   BOOL isChanged = FALSE;
   int i;
   for (i = 0; i < s_dest->core_config_count; i ++) {
@@ -2077,7 +2162,8 @@ BOOL combineCompatibleStates(State * s_dest, State * s_src) {
  * Since the core confiurations are both in increasing order,
  * just compare them by pairs.
  */
-BOOL isSameState(State * s1, State * s2) {
+BOOL isSameState(State * s1, State * s2)
+{
   int i;
 
   if (s1->core_config_count != s2->core_config_count) {
@@ -2100,7 +2186,8 @@ BOOL isSameState(State * s1, State * s2) {
  * NOTE: combining compatible states is done here!
  */
 State * isExistingState(State_collection * sc, State * s,
-                        int * is_compatible) {
+                        int * is_compatible)
+{
   State * t = sc->states_head;
   int i = 0; // index of state.
 
@@ -2123,7 +2210,8 @@ State * isExistingState(State_collection * sc, State * s,
 }
 
 
-State * createState() {
+State * createState()
+{
   State * s = (State *) malloc(sizeof(State));
   if (s == NULL) {
     printf("createState error: out of memeory\n");
@@ -2156,7 +2244,8 @@ State * createState() {
 
 
 void insertReductionToParsingTable(
-       Configuration * c, int state_no) {
+       Configuration * c, int state_no)
+{
   SymbolNode * a;
 
   if (grammar.rules[c->ruleID]->nLHS->snode ==
@@ -2177,7 +2266,8 @@ void insertReductionToParsingTable(
  * s - src state, n - new state.
  * Add n to the successor list of s.
  */
-void addSuccessor(State * s, State * n) {
+void addSuccessor(State * s, State * n)
+{
   s->successor_list[s->successor_count] = n;
   s->successor_count ++;
 
@@ -2209,7 +2299,8 @@ void addSuccessor(State * s, State * n) {
  * Used in 3 places: y.c, lr0.c, lane_tracing.c.
  * This can be changed to macro later.
  */
-void insert_state_to_PM(State * s) {
+void insert_state_to_PM(State * s)
+{
   s->state_no = states_new->state_count;
 
   addState2Collection(states_new, s);
@@ -2244,7 +2335,8 @@ void insert_state_to_PM(State * s) {
  *
  */
 BOOL addTransitionStates2New(
-       State_collection * coll, State * src_state) {
+       State_collection * coll, State * src_state)
+{
   BOOL src_state_changed = FALSE;
   int is_compatible;
   State * os, * next, * s;
@@ -2301,7 +2393,8 @@ BOOL addTransitionStates2New(
  * Add these new temp states to states_new if not existed,
  * and add transition to parsing table as well.
  */
-void transition(State * s) {
+void transition(State * s)
+{
   int i;
   Configuration * c, * new_config;
   SymbolTblNode * scanned_symbol = NULL;
@@ -2352,7 +2445,8 @@ void transition(State * s) {
 }
 
 
-BOOL isCompatibleConfig(Configuration * c1, Configuration * c2) {
+BOOL isCompatibleConfig(Configuration * c1, Configuration * c2)
+{
   if (c1 == NULL || c2 == NULL) return FALSE;
   if (c1->marker != c2->marker) return FALSE;
   if (c1->ruleID != c2->ruleID) return FALSE;
@@ -2366,7 +2460,8 @@ BOOL isCompatibleConfig(Configuration * c1, Configuration * c2) {
  *
  * Returns TRUE if any change is made.
  */
-BOOL combineContext(Context * c_dest, Context * c_src) {
+BOOL combineContext(Context * c_dest, Context * c_src)
+{
   SymbolNode * a;
   BOOL isChanged = FALSE;
   if (c_dest == NULL || c_src == NULL) return FALSE;
@@ -2384,7 +2479,8 @@ BOOL combineContext(Context * c_dest, Context * c_src) {
 /*
  * The main function to generate parsing machine.
  */
-void generate_parsing_machine() {
+void generate_parsing_machine()
+{
   State * new_state = states_new->states_head;
 
   if (DEBUG_GEN_PARSING_MACHINE == TRUE) {
@@ -2410,7 +2506,8 @@ void generate_parsing_machine() {
 }
 
 
-void dump_state_collections() {
+void dump_state_collections()
+{
   writeStateCollection(states_new);
 }
 
@@ -2433,7 +2530,8 @@ void dump_state_collections() {
  * 0 <= i < total states count
  * 0 <= j < col_no
  */
-void initParsingTable() {
+void initParsingTable()
+{
   int total_cells;
 
   PARSING_TABLE_SIZE = PARSING_TABLE_INIT_SIZE;
@@ -2445,7 +2543,8 @@ void initParsingTable() {
 }
 
 
-void expandParsingTable() {
+void expandParsingTable()
+{
   int total_cells = PARSING_TABLE_SIZE * ParsingTblCols;
 
   HYY_EXPAND(ParsingTable, int, 2 * total_cells);
@@ -2471,7 +2570,8 @@ void expandParsingTable() {
  * Results are stored in variables action and state_dest.
  */
 void getAction(int symbol_type, int col, int row,
-               char * action, int * state_dest) {
+               char * action, int * state_dest)
+{
   int x = ParsingTable[row * ParsingTblCols + col];
 
   if (x == 0) {
@@ -2522,7 +2622,8 @@ void getAction(int symbol_type, int col, int row,
  *   clearStateTerminalTransitions(state_no)
  * in lane_tracing.c.
  */
-void insertAction(SymbolTblNode * lookahead, int row, int state_dest) {
+void insertAction(SymbolTblNode * lookahead, int row, int state_dest)
+{
   Conflict * c;
   int reduce, shift; // for shift/reduce conflict.
   struct TerminalProperty * tp_s = NULL, * tp_r = NULL;
@@ -2629,13 +2730,15 @@ void insertAction(SymbolTblNode * lookahead, int row, int state_dest) {
 }
 
 
-BOOL isGoalSymbol(SymbolTblNode * snode) {
+BOOL isGoalSymbol(SymbolTblNode * snode)
+{
   if (snode == grammar.goal_symbol->snode) return TRUE;
   return FALSE;
 }
 
 
-void printParsingTableNote() {
+void printParsingTableNote()
+{
   yyprintf("Note: \n");
   yyprintf("1. si means shift and stack state i\n");
   yyprintf("2. ri means reduce by production numbered i\n");
@@ -2654,7 +2757,8 @@ void printParsingTableNote() {
  *
  * Parsing table: Ref. Aho&Ullman p219.
  */
-void printParsingTable() {
+void printParsingTable()
+{
   char action;
   int state;
   int row, col;
@@ -2690,7 +2794,8 @@ void printParsingTable() {
  * 
  * Assumption: grammar.rules[0] is the goal production.
  */
-void initStartState() {
+void initStartState()
+{
   int is_compatible= 0;
   State * state0 = createState();
   state0->config_count = 1;
@@ -2728,7 +2833,8 @@ void initStartState() {
  * token to proceed parsing. Array final_state_list is
  * used in gen_compiler.c, and function writeParsingTblRow() of y.c.
  */
-void get_final_state_list() {
+void get_final_state_list()
+{
   int i, j, row_start, action, new_action;
   SymbolTblNode * n;
 
@@ -2778,7 +2884,8 @@ void get_final_state_list() {
 }
 
 
-void getAvgConfigCount() {
+void getAvgConfigCount()
+{
   int i = 0, sum = 0, max = 0, min = 0;
   State * a;
   a = states_new->states_head;
@@ -2797,7 +2904,8 @@ void getAvgConfigCount() {
 }
 
 
-void show_state_config_info() {
+void show_state_config_info()
+{
 
 #if USE_CONFIG_QUEUE_FOR_GET_CLOSURE
   queue_info(config_queue);
@@ -2816,7 +2924,8 @@ void show_state_config_info() {
 /*
  * print size of different objects. For development use only.
  */
-void print_size() {
+void print_size()
+{
   printf("size of Grammar: %lu\n", sizeof(Grammar));
   printf("size of State_collection: %lu\n", sizeof(State_collection));
   printf("size of State: %lu\n", sizeof(State));
@@ -2828,7 +2937,8 @@ void print_size() {
 }
 
 
-void show_conflict_count() {
+void show_conflict_count()
+{
   // no conflicts.
   if (rs_count == 0 && rr_count == 0 && ss_count == 0) return;
 
@@ -2851,7 +2961,8 @@ void show_conflict_count() {
 
 
 /* Show statistics of the grammar and it's parsing machine. */
-void show_stat() {
+void show_stat()
+{
   if (USE_VERBOSE == FALSE) return;
 
   writeStateTransitionList();
@@ -2906,7 +3017,8 @@ void show_stat() {
  * Used when --lr0 or --lalr is used.
  * Under such situation USE_LR0 or USE_LALR is true.
  */
-void writeParsingTblRow_LALR(int state) {
+void writeParsingTblRow_LALR(int state)
+{
   int col, row_start = state * ParsingTblCols;
   int v;
   SymbolTblNode * s;
@@ -2970,7 +3082,8 @@ void writeParsingTblRow_LALR(int state) {
 }
 
 
-void writeParsingTblRow(int state) {
+void writeParsingTblRow(int state)
+{
   int col, row_start = state * ParsingTblCols;
   int v;
   SymbolTblNode * s;
@@ -3012,7 +3125,8 @@ void writeParsingTblRow(int state) {
 }
 
 
-void writeStateInfo(State * s) {
+void writeStateInfo(State * s)
+{
   int i;
   if (s == NULL) {
     //printf("writeState warning: s is NULL\n");
@@ -3045,7 +3159,8 @@ void writeStateInfo(State * s) {
 }
 
 
-void writeStateCollectionInfo(State_collection * c) {
+void writeStateCollectionInfo(State_collection * c)
+{
   State * s;
 
   //yyprintf2("\n==State List: (count=%d)==\n\n", c->state_count);
@@ -3062,7 +3177,8 @@ void writeStateCollectionInfo(State_collection * c) {
 }
 
 
-void writeStateInfoFromParsingTbl() {
+void writeStateInfoFromParsingTbl()
+{
   int row;
   //yyprintf2("\n==States (count = %d)==\n", actual_state_no_ct / 2);
   for (row = 0; row < ParsingTblRows; row ++) {
@@ -3079,7 +3195,8 @@ void writeStateInfoFromParsingTbl() {
 /*
  * A list like the list in AT&T yacc and Bison's y.output file.
  */ 
-void writeStateTransitionList() {
+void writeStateTransitionList()
+{
   if (SHOW_STATE_TRANSITION_LIST == FALSE) return;
 
   if (USE_REMOVE_UNIT_PRODUCTION == TRUE) {
@@ -3100,7 +3217,8 @@ void writeStateTransitionList() {
 /* 
  * LR1 function.
  */
-int LR1(int argc, char ** argv) {
+int LR1(int argc, char ** argv)
+{
 
   hashTbl_init();
 
@@ -3167,7 +3285,8 @@ int LR1(int argc, char ** argv) {
 }
 
 
-int LR0(int argc, char ** argv) {
+int LR0(int argc, char ** argv)
+{
 
   ///USE_COMBINE_COMPATIBLE_STATES = FALSE; ///
   hashTbl_init();
@@ -3248,7 +3367,8 @@ int LR0(int argc, char ** argv) {
 /*
  * main function.
  */
-int main(int argc, char ** argv) {
+int main(int argc, char ** argv)
+{
   int infile_index;
   DEBUG_EXPAND_ARRAY = 0;
 
@@ -3272,4 +3392,3 @@ int main(int argc, char ** argv) {
 
   return 0;
 }
-

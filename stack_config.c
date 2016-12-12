@@ -30,12 +30,14 @@
 #include "stack_config.h"
 
 
-stack * stack_create() {
+stack * stack_create()
+{
   return stack_create2(STACK_INIT_SIZE);
 }
 
 
-stack * stack_create2(int size) {
+stack * stack_create2(int size)
+{
   stack * s = (stack *) malloc(sizeof(stack));
   if (s == NULL) {
     puts("stack_create: out of memory");
@@ -53,7 +55,8 @@ stack * stack_create2(int size) {
 }
 
 
-void stack_push(stack * s, Configuration * n) {
+void stack_push(stack * s, Configuration * n)
+{
   s->array[s->pt] = n;
   s->pt ++;
 #if DEBUG_STACK
@@ -77,7 +80,8 @@ void stack_push(stack * s, Configuration * n) {
 }
 
 
-Configuration * stack_pop(stack * s) {
+Configuration * stack_pop(stack * s)
+{
   if (s->pt == 0) { 
     if (USE_WARNING)
       puts("stack_pop warning: underflow, return NULL"); 
@@ -92,7 +96,8 @@ Configuration * stack_pop(stack * s) {
 }
 
 
-Configuration * stack_top(stack * s) {
+Configuration * stack_top(stack * s)
+{
   if (s->pt == 0) { 
     if (USE_WARNING)
       puts("stack_top warning: underflow, return NULL");
@@ -109,18 +114,21 @@ Configuration * stack_top(stack * s) {
 /* 
  * @Return: number of elements in the stack.
  */
-int stack_count(stack * s) {
+int stack_count(stack * s)
+{
   return s->pt;
 }
 
 
-void stack_destroy(stack * s) { 
+void stack_destroy(stack * s)
+{ 
   free(s->array);
   free(s); 
 }
 
 
-void stack_dump(stack * s) {
+void stack_dump(stack * s)
+{
   int i;
   Configuration * c;
   printf("stack capacity: %d, count: %d\n", 
@@ -141,4 +149,3 @@ void stack_dump(stack * s) {
   }
   putchar('\n');
 }
-

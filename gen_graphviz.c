@@ -33,7 +33,8 @@
 
 
 typedef struct _gvNode gvNode;
-struct _gvNode {
+struct _gvNode
+{
   int target_state;
   SymbolNode * labels;
   SymbolNode * labels_tail;
@@ -41,7 +42,8 @@ struct _gvNode {
 };
 
 
-static gvNode * createGvNode(int targetState) {
+static gvNode * createGvNode(int targetState)
+{
   gvNode * gvn;
   HYY_NEW(gvn, gvNode, 1);
   gvn->target_state = targetState;
@@ -52,14 +54,16 @@ static gvNode * createGvNode(int targetState) {
 }
 
 
-static void destroyGvNode(gvNode * n) {
+static void destroyGvNode(gvNode * n)
+{
   if (NULL == n) return;
   freeSymbolNodeList(n->labels);
   free(n);
 }
 
 
-static void destroyGvNodeList(gvNode * list) {
+static void destroyGvNodeList(gvNode * list)
+{
   gvNode * tmp;
   if (NULL == list) return;
   while ((tmp = list) != NULL) {
@@ -69,7 +73,8 @@ static void destroyGvNodeList(gvNode * list) {
 }
 
 
-static gvNode * findGvNodeInList(gvNode * list, int targetState) {
+static gvNode * findGvNodeInList(gvNode * list, int targetState)
+{
   if (NULL == list) return NULL;
   while (list != NULL) {
     if (list->target_state == targetState) return list;
@@ -82,7 +87,8 @@ static gvNode * findGvNodeInList(gvNode * list, int targetState) {
 /*
  * find label in label list.
  */
-static void insertLabelToList(gvNode * n, SymbolTblNode * snode) {
+static void insertLabelToList(gvNode * n, SymbolTblNode * snode)
+{
   if (NULL == n || NULL == snode) return; // should not happen.
 
   if (NULL == n->labels) {
@@ -108,7 +114,8 @@ static void insertLabelToList(gvNode * n, SymbolTblNode * snode) {
  *   create a new node and insert it to list.
  */
 static gvNode * addGvNodeToList(gvNode * list, 
-    int targetState, SymbolTblNode * snode) {
+    int targetState, SymbolTblNode * snode)
+{
   gvNode * n = findGvNodeInList(list, targetState);
   if (NULL == n) { // targetState NOT found. Add to list.
 #if DEBUG_GEN_GVIZ
@@ -140,7 +147,8 @@ static gvNode * addGvNodeToList(gvNode * list,
  * dump r list 
  */
 static void dumpGvNodeList_r(
-    gvNode * list, int srcState, FILE * fp) {
+    gvNode * list, int srcState, FILE * fp)
+{
   SymbolNode * labels;
   if (NULL == list) return;
   while (list != NULL) {
@@ -162,7 +170,8 @@ static void dumpGvNodeList_r(
  * dump s list
  */
 static void dumpGvNodeList_s(
-    gvNode * list, int srcState, FILE * fp) {
+    gvNode * list, int srcState, FILE * fp)
+{
   SymbolNode * labels;
   if (NULL == list) return;
   while (list != NULL) {
@@ -180,7 +189,8 @@ static void dumpGvNodeList_s(
 }
 
 
-static int getGvNodeListLen(gvNode * list) {
+static int getGvNodeListLen(gvNode * list)
+{
   int len = 0;
 
   while (list != NULL) {
@@ -205,7 +215,8 @@ static int getGvNodeListLen(gvNode * list) {
  *
  * @created on: 3/11/2008
  */
-static gvNode * update_r_list(gvNode * r_list, gvNode * s_list) {
+static gvNode * update_r_list(gvNode * r_list, gvNode * s_list)
+{
   int state;
   char * strAny = "(any)"; // means: any terminal can cause reduction.
 
@@ -233,7 +244,8 @@ static gvNode * update_r_list(gvNode * r_list, gvNode * s_list) {
  * Has the same logic as printParsingTable() in y.c.
  * For O0, O1.
  */
-void gen_graphviz_input() {
+void gen_graphviz_input()
+{
   char action;
   int state;
   int row, col;
@@ -292,7 +304,8 @@ void gen_graphviz_input() {
  * Has the same logic as printCondensedFinalParsingTable() in y.c.
  * For O2, O3.
  */
-void gen_graphviz_input2() {
+void gen_graphviz_input2()
+{
   SymbolTblNode * n;
   char action;
   int row, col, i, state, srcState;
@@ -351,4 +364,3 @@ void gen_graphviz_input2() {
   fputs("\n}\n", fp_gviz);
   fclose(fp_gviz);
 }
-

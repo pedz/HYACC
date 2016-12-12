@@ -42,11 +42,13 @@ LRk_P_T_Array * lrk_pt_array;
 
 static void print_int(void * object) { printf("%d\n", * ((int *) object)); }
 static void print_string(void * object) { printf("%s\n", (char *) object); }
-void print_symbolList(void * object) {
+void print_symbolList(void * object)
+{
   SymbolNode * n = (SymbolNode *) object;
   writeSymbolList(n, "");
 }
-static void print_cfg_ctxt(void * object) {
+static void print_cfg_ctxt(void * object)
+{
   Configuration * c;
   SymbolList n;
   cfg_ctxt * cc;
@@ -63,7 +65,8 @@ static void print_cfg_ctxt(void * object) {
   writeSymbolList(n, "");
 }
 
-static void test_int() {
+static void test_int()
+{
   Set * s;
   int i, j, k;
 
@@ -81,7 +84,8 @@ static void test_int() {
 }
 
 
-static void test_str() {
+static void test_str()
+{
   Set * s;
   char * s1 = "s1"; 
   char * s2 = "s2";
@@ -96,7 +100,8 @@ static void test_str() {
   Set_dump(s, & print_string);
 }
 
-static void test_lrk_theads() {
+static void test_lrk_theads()
+{
   SymbolList alpha;
   SymbolNode * t;
   List * th;
@@ -116,7 +121,8 @@ static void test_lrk_theads() {
 }
 
 
-static void dump_conflict_list(Conflict * c) {
+static void dump_conflict_list(Conflict * c)
+{
   for (; c != NULL; c = c->next) {
     printf("state %d, token %s, actions: [%d, %d], decision: %d\n",
            c->state, c->lookahead->symbol,
@@ -125,7 +131,8 @@ static void dump_conflict_list(Conflict * c) {
 }
 
 
-void test_dump_P_conflict() {
+void test_dump_P_conflict()
+{
   int i, len;
   len = states_new_array->state_count;
   printf("dump_P_conflict(). total states: %d\n", len);
@@ -140,7 +147,8 @@ void test_dump_P_conflict() {
 
 
 // return the length of the symbollist.
-int get_lrk_theads_len(SymbolList s) {
+int get_lrk_theads_len(SymbolList s)
+{
   SymbolNode * t;
   int len = 0;
   
@@ -152,7 +160,8 @@ int get_lrk_theads_len(SymbolList s) {
 
 
 // return the last symbol node.
-SymbolNode * get_last_symbol(SymbolList s) {
+SymbolNode * get_last_symbol(SymbolList s)
+{
   SymbolNode * t;
   if (NULL == s) return NULL;
 
@@ -162,7 +171,8 @@ SymbolNode * get_last_symbol(SymbolList s) {
 }
 
 
-static Configuration * get_start_config_from_tail(Configuration * c) {
+static Configuration * get_start_config_from_tail(Configuration * c)
+{
   ConfigPairNode * n = ConfigPairList_find(lane_head_tail_pairs, c);
   if (NULL == n) return NULL;
   else return n->start;
@@ -174,7 +184,8 @@ static Configuration * get_start_config_from_tail(Configuration * c) {
 // Otherwise, compare cc->ctxt symbol list and add in new symbols
 // to the object in set.
 //
-static Set * insert_cfg_ctxt_to_set(cfg_ctxt * cc, Set * st) {
+static Set * insert_cfg_ctxt_to_set(cfg_ctxt * cc, Set * st)
+{
   Object_item * o;
   cfg_ctxt * s;
 
@@ -206,7 +217,8 @@ static Set * insert_cfg_ctxt_to_set(cfg_ctxt * cc, Set * st) {
  */
 static Set * insert_LRk_PT(int state_no, SymbolNode * token_list, 
     SymbolTblNode * col, Configuration * c, Configuration * c_tail, 
-    Set * set_c2) {
+    Set * set_c2)
+{
   cfg_ctxt * cc;
   SymbolNode * token;
   LRk_P_T * pt; // LR(k) parsing table where k = MAX_K.
@@ -241,7 +253,8 @@ static Set * insert_LRk_PT(int state_no, SymbolNode * token_list,
 }
 
 
-static void lrk_config_lane_tracing(Configuration * c) {
+static void lrk_config_lane_tracing(Configuration * c)
+{
   EDGE_PUSHING_CONTEXT_GENERATED = NULL;
   IN_EDGE_PUSHING_LANE_TRACING = TRUE;
   lane_tracing_reduction(c);
@@ -264,7 +277,8 @@ static void lrk_config_lane_tracing(Configuration * c) {
 /*
  * @Return: the conflict symbol list of configuration c in INC order.
  */
-static SymbolList getConfigConflictContext(Configuration * c) {
+static SymbolList getConfigConflictContext(Configuration * c)
+{
   Conflict * n; // conflict list.
   SymbolList contxt;
   SymbolNode * ret_list = NULL;
@@ -292,7 +306,8 @@ static SymbolList getConfigConflictContext(Configuration * c) {
 
 static Set * fill_set_c2(ConfigPairNode * n, 
         Configuration * c, Configuration * c_tail, 
-        int k1, Set * set_c2, int state_no, cfg_ctxt * cc) {
+        int k1, Set * set_c2, int state_no, cfg_ctxt * cc)
+{
   SymbolNode * sn;
   // n->start is the next level lane head.
   n->start->z = c->z + k1 - 1; 
@@ -313,7 +328,8 @@ static Set * fill_set_c2(ConfigPairNode * n,
 /*
  * @Input: inadequate state no.: state_no.
  */
-static void edge_pushing(int state_no) {
+static void edge_pushing(int state_no)
+{
   cfg_ctxt * cc;
   Set * set_c;
   Set * set_c2;
@@ -416,7 +432,8 @@ static void edge_pushing(int state_no) {
 /*
  * Remove r/r conflict nodes from list.
  */
-static void removeRRConflictFromList(int state_no) {
+static void removeRRConflictFromList(int state_no)
+{
   Conflict * c, * c_prev;
   int i;
 
@@ -458,7 +475,8 @@ static void removeRRConflictFromList(int state_no) {
  * 1) set entry to -10000010.
  * 2) remove this conflict from conflict list.
  */
-static void update_LR1_ParsingTable(int state_no) {
+static void update_LR1_ParsingTable(int state_no)
+{
   Conflict * c;
   c = states_new_array->conflict_list[state_no];
   for (; c != NULL; c = c->next) {
@@ -470,7 +488,8 @@ static void update_LR1_ParsingTable(int state_no) {
 }
 
 
-void lane_tracing_LR_k() {
+void lane_tracing_LR_k()
+{
   int i, ct, ct_rr, state_no;
   if (0 == states_inadequate->count_unresolved) return;
   LRk_PT = NULL; // parsing table extension.
@@ -493,4 +512,3 @@ void lane_tracing_LR_k() {
     }
   }
 }
-

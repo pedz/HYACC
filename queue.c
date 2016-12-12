@@ -34,7 +34,8 @@
 #define DEBUG_QUEUE 0
 
 
-Queue * queue_create() {
+Queue * queue_create()
+{
   Queue * q = (Queue *) malloc(sizeof(Queue));
   if (q == NULL) {
     printf("out of memory\n");
@@ -58,20 +59,23 @@ Queue * queue_create() {
 }
 
 
-void queue_destroy(Queue * q) {
+void queue_destroy(Queue * q)
+{
   free(q->array);
   free(q);
 }
 
 
-void queue_clear(Queue * q) {
+void queue_clear(Queue * q)
+{
   q->head = 0;
   q->tail = 0;
   q->count = 0;
 }
 
 
-void queue_clear_all(Queue * q) {
+void queue_clear_all(Queue * q)
+{
   q->head = 0;
   q->tail = 0;
   q->count = 0;
@@ -79,7 +83,8 @@ void queue_clear_all(Queue * q) {
 }
 
 
-void queue_expand(Queue * q) {
+void queue_expand(Queue * q)
+{
   int i, pt;
   int * new_array, * old_array;
 
@@ -116,7 +121,8 @@ void queue_expand(Queue * q) {
 /*
  * push at tail.
  */
-void queue_push(Queue * q, int n) {
+void queue_push(Queue * q, int n)
+{
   if (q->count >= q->size) queue_expand(q);
 
   if (n == QUEUE_ERR_CODE) {
@@ -145,7 +151,8 @@ void queue_push(Queue * q, int n) {
 /*
  * pop at front
  */
-int queue_pop(Queue * q) {
+int queue_pop(Queue * q)
+{
   int item;
   if (q->count == 0) return QUEUE_ERR_CODE;
 
@@ -162,13 +169,15 @@ int queue_pop(Queue * q) {
 }
 
 
-int queue_peek(Queue * q) {
+int queue_peek(Queue * q)
+{
   if (q->count == 0) return QUEUE_ERR_CODE;
   return q->array[q->head];
 }
 
 
-int queue_count(Queue * q) {
+int queue_count(Queue * q)
+{
   return q->count;
 }
 
@@ -176,7 +185,8 @@ int queue_count(Queue * q) {
 /*
  * Check if number n exists in the q.
  */
-int queue_exist(Queue * q, int n) {
+int queue_exist(Queue * q, int n)
+{
   int i;
   int pt = q->head;
   for (i = 0; i < q->count; i ++) {
@@ -188,7 +198,8 @@ int queue_exist(Queue * q, int n) {
 }
 
 
-void queue_dump(Queue * q) {
+void queue_dump(Queue * q)
+{
   int i, pt;
   pt = q->head;
   for (i = 0; i < q->count; i ++) {
@@ -203,7 +214,8 @@ void queue_dump(Queue * q) {
 /*
  * Print the usage information of the queue.
  */
-void queue_info(Queue * q) {
+void queue_info(Queue * q)
+{
 #if DEBUG_QUEUE
   printf("queue_push is called %d times, ", q->call_count);
   printf("max count: %d, average count: %.2f\n", 

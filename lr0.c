@@ -32,7 +32,8 @@
 static void propagateOriginatorChange(State * s);
 
 
-void addSuccessorConfigToState_LR0(State * s, int ruleID) {
+void addSuccessorConfigToState_LR0(State * s, int ruleID)
+{
   Configuration * c;
 
   if (s->config_count >= s->config_max_count - 1) {
@@ -53,7 +54,8 @@ void addSuccessorConfigToState_LR0(State * s, int ruleID) {
  * Assumption: public variable config_queue contains 
  * the configurations to be processed.
  */
-void getConfigSuccessors_LR0(State * s) {
+void getConfigSuccessors_LR0(State * s)
+{
   RuleIDNode * r;
   SymbolTblNode * scanned_symbol = NULL;
   Configuration * config;
@@ -87,7 +89,8 @@ void getConfigSuccessors_LR0(State * s) {
 }
 
 
-void getClosure_LR0(State * s) {
+void getClosure_LR0(State * s)
+{
   int i;
   //queue_clear(config_queue);
   for (i = 0; i < s->config_count; i ++) {
@@ -101,7 +104,8 @@ void getClosure_LR0(State * s) {
  * For LR(0). Insert a/r actions to the ENTIRE row.
  */
 void insertReductionToParsingTable_LR0(
-       Configuration * c, int state_no) {
+       Configuration * c, int state_no)
+{
   int col;
   SymbolTblNode * n;
   int max_col = grammar.terminal_count + 1;
@@ -124,7 +128,8 @@ void insertReductionToParsingTable_LR0(
  * otherwise, fill cells with lookaheads in the context set.
  */
 void insertReductionToParsingTable_LALR(
-       Configuration * c, int state_no) {
+       Configuration * c, int state_no)
+{
   SymbolNode * a;
   int col;
   SymbolTblNode * n;
@@ -162,7 +167,8 @@ void insertReductionToParsingTable_LALR(
  * states are always the "same", but not compatible.
  */
 void addTransitionStates2New_LR0(
-       State_collection * coll, State * src_state) {
+       State_collection * coll, State * src_state)
+{
   State * os, * next, * s;
   s = coll->states_head;
 
@@ -198,7 +204,8 @@ void addTransitionStates2New_LR0(
  * Add these new temp states to states_new if not existed,
  * and add transition to parsing table as well.
  */
-void transition_LR0(State * s) {
+void transition_LR0(State * s)
+{
   int i;
   Configuration * c, * new_config;
   SymbolTblNode * scanned_symbol = NULL;
@@ -248,7 +255,8 @@ void transition_LR0(State * s) {
  * Then fill r. r is filled to terminal symbols only. And if
  * a cell is already a/s/g, don't fill this r.
  */
-static void outputParsingTableRow_LR0(State * s) {
+static void outputParsingTableRow_LR0(State * s)
+{
   int i, ct;
   Configuration * c;
   State * t;
@@ -276,7 +284,8 @@ static void outputParsingTableRow_LR0(State * s) {
 }
 
 
-static void outputParsingTableRow_LALR(State * s) {
+static void outputParsingTableRow_LALR(State * s)
+{
   int i, ct;
   Configuration * c;
   State * t;
@@ -310,7 +319,8 @@ static void outputParsingTableRow_LALR(State * s) {
  * LR(0) since all default actions are reduce, the previous 
  * method does not work very well.
  */
-void outputParsingTable_LR0() {
+void outputParsingTable_LR0()
+{
   State * s;
   int i, cols, rows;
   rows = states_new_array->state_count;
@@ -333,7 +343,8 @@ void outputParsingTable_LR0() {
 /*
  *
  */
-void outputParsingTable_LALR() {
+void outputParsingTable_LALR()
+{
   State * s;
   int i, cols, rows;
   rows = states_new_array->state_count;
@@ -353,7 +364,8 @@ void outputParsingTable_LALR() {
 }
 
 
-void updateParsingTable_LR0() {
+void updateParsingTable_LR0()
+{
   ParsingTblRows = states_new->state_count;
   n_state_opt1 = states_new->state_count;
 
@@ -362,7 +374,8 @@ void updateParsingTable_LR0() {
 }
 
 
-void generate_LR0_parsing_machine() {
+void generate_LR0_parsing_machine()
+{
   State * new_state = states_new->states_head;
 
   if (DEBUG_GEN_PARSING_MACHINE == TRUE) {
@@ -386,4 +399,3 @@ void generate_LR0_parsing_machine() {
   updateParsingTable_LR0();
 
 }
-

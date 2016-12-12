@@ -42,13 +42,15 @@ void writeAllMRParents();
 ////////////////////////////////////////////
 
 
-void initArray_leafIndexForParent() {
+void initArray_leafIndexForParent()
+{
   leafIndexForParent = (int *) malloc(sizeof(int) * MRParents_INIT_MAX_COUNT);
   if (leafIndexForParent == NULL)
     YYERR_EXIT("initArray_leafIndexForparent error: out of memory\n");
 }
 
-void expandArray_leafIndexForParent() {
+void expandArray_leafIndexForParent()
+{
   leafIndexForParent = (int *) realloc((void *) leafIndexForParent,
                        sizeof(int) * all_parents->max_count);
   if (leafIndexForParent == NULL)
@@ -59,12 +61,14 @@ void expandArray_leafIndexForParent() {
            all_parents->max_count);
 }
 
-void destroy_leafIndexForParent() {
+void destroy_leafIndexForParent()
+{
   free(leafIndexForParent);
 }
 
 
-MRParents * createMRParents() {
+MRParents * createMRParents()
+{
   MRParents * p = (MRParents *) malloc(sizeof(MRParents));
   if (p == NULL) 
     YYERR_EXIT("createMRParents error: out of memory\n");
@@ -80,7 +84,8 @@ MRParents * createMRParents() {
 }
 
 
-void checkArraySize_MRParents(MRParents * p) {
+void checkArraySize_MRParents(MRParents * p)
+{
   if (p->count < p->max_count) return;
 
   p->max_count *= 2;
@@ -97,7 +102,8 @@ void checkArraySize_MRParents(MRParents * p) {
 }
 
 
-void destroyMRParents(MRParents * p) {
+void destroyMRParents(MRParents * p)
+{
   int i;
   if (p == NULL) return;
   for (i = 0; i < p->count; i++) free(p->parents[i]);
@@ -106,7 +112,8 @@ void destroyMRParents(MRParents * p) {
 }
 
 
-void createMRLeavesArray() {
+void createMRLeavesArray()
+{
   MRLeaves_max_count = MRLeaves_INIT_MAX_COUNT;
   MRLeaves = (MRTreeNode **) 
               malloc(sizeof(MRTreeNode *) * MRLeaves_max_count);
@@ -115,7 +122,8 @@ void createMRLeavesArray() {
 }
 
 
-void checkMRLeavesArraySize() {
+void checkMRLeavesArraySize()
+{
   if (MRLeaves_count < MRLeaves_max_count) return;
 
   MRLeaves_max_count *= 2;
@@ -129,12 +137,14 @@ void checkMRLeavesArraySize() {
 }
 
 
-void destroyMRLeavesArray() {
+void destroyMRLeavesArray()
+{
   free(MRLeaves);
 }
 
 
-void writeLeafIndexForParent() {
+void writeLeafIndexForParent()
+{
   int i;
   for (i = 0; i < all_parents->count; i ++) {
     if (i > 0) yyprintf(", ");
@@ -148,7 +158,8 @@ void writeLeafIndexForParent() {
  * Find a string in a string array.
  * Returns the array index if found, -1 otherwise.
  */
-int getIndexInMRParents(SymbolTblNode * s, MRParents * p) {
+int getIndexInMRParents(SymbolTblNode * s, MRParents * p)
+{
   int i;
   for (i = 0; i < p->count; i ++) {
     if (s == p->parents[i]->snode) return i;
@@ -160,17 +171,20 @@ int getIndexInMRParents(SymbolTblNode * s, MRParents * p) {
 /*
  * Determines if string s is in an array a of length count.
  */
-BOOL isInMRParents(SymbolTblNode * s, MRParents * p) {
+BOOL isInMRParents(SymbolTblNode * s, MRParents * p)
+{
   return (getIndexInMRParents(s, p) >= 0);
 }
 
 
-BOOL isParentSymbol(SymbolTblNode * s) {
+BOOL isParentSymbol(SymbolTblNode * s)
+{
   return isInMRParents(s, all_parents);
 }
 
 
-MRTreeNode * findNodeInTree(MRTreeNode * node, SymbolTblNode * symbol) {
+MRTreeNode * findNodeInTree(MRTreeNode * node, SymbolTblNode * symbol)
+{
   if (node == NULL) {
     //printf("findNodeInTree warning: node is null\n");
     return NULL;
@@ -189,7 +203,8 @@ MRTreeNode * findNodeInTree(MRTreeNode * node, SymbolTblNode * symbol) {
 }
 
 
-MRTreeNode * findNodeInForest(SymbolTblNode * symbol) {
+MRTreeNode * findNodeInForest(SymbolTblNode * symbol)
+{
   int i;
   MRTreeNode * node;
   for (i = 0; i < MRLeaves_count; i ++) {
@@ -200,7 +215,8 @@ MRTreeNode * findNodeInForest(SymbolTblNode * symbol) {
 }
 
 
-MRTreeNode * createMRTreeNode(SymbolTblNode * symbol) {
+MRTreeNode * createMRTreeNode(SymbolTblNode * symbol)
+{
   MRTreeNode * node = (MRTreeNode *) malloc(sizeof(MRTreeNode));
   if (node == NULL) {
     printf("createMRTreeNode error: out of memory\n");
@@ -218,7 +234,8 @@ MRTreeNode * createMRTreeNode(SymbolTblNode * symbol) {
 }
 
 
-void destroyMRTreeNode(MRTreeNode * node) {
+void destroyMRTreeNode(MRTreeNode * node)
+{
   if (node == NULL) return;
   free(node->symbol);
   free(node->parent);
@@ -231,7 +248,8 @@ void destroyMRTreeNode(MRTreeNode * node) {
  * The new tree's root node contains symbol parent,
  * and leaf node contains symbol child.
  */
-void insertNewTree(SymbolTblNode * parent, SymbolTblNode * child) {
+void insertNewTree(SymbolTblNode * parent, SymbolTblNode * child)
+{
   MRTreeNode * leaf = createMRTreeNode(child);
   leaf->parent[0] = createMRTreeNode(parent);
   leaf->parent_count = 1;
@@ -247,7 +265,8 @@ void insertNewTree(SymbolTblNode * parent, SymbolTblNode * child) {
  * If the parent array of node reaches size limit,
  * expand it.
  */
-void checkParentArraySize(MRTreeNode * node) {
+void checkParentArraySize(MRTreeNode * node)
+{
   if (node->parent_count < node->parent_max_count) return;
 
   node->parent_max_count *= 2;
@@ -262,7 +281,8 @@ void checkParentArraySize(MRTreeNode * node) {
 }
 
 
-void insertParent(MRTreeNode * node, SymbolTblNode * symbol) {
+void insertParent(MRTreeNode * node, SymbolTblNode * symbol)
+{
   MRTreeNode * parent;
   checkParentArraySize(node);
   parent = createMRTreeNode(symbol);
@@ -275,7 +295,8 @@ void insertParent(MRTreeNode * node, SymbolTblNode * symbol) {
  * Returns the index in array MRLeaves[] if given node
  * is a leaf, otherwise returns -1.
  */
-int isMRLeaf(MRTreeNode * node) {
+int isMRLeaf(MRTreeNode * node)
+{
   int i;
   for (i = 0; i < MRLeaves_count; i ++) {
     if (node == MRLeaves[i]) return i;
@@ -284,7 +305,8 @@ int isMRLeaf(MRTreeNode * node) {
 }
 
 
-void writeBranch(SymbolList branch) {
+void writeBranch(SymbolList branch)
+{
   SymbolNode * a;
   for (a = branch; a != NULL; a = a->next) {
     if (a != branch) yyprintf(", ");
@@ -299,7 +321,8 @@ void writeBranch(SymbolList branch) {
  * the given node to its ancestors.
  */
 void writeLeafBranch(MRTreeNode * node, 
-    SymbolList branch, SymbolNode * branch_tail) {
+    SymbolList branch, SymbolNode * branch_tail)
+{
 
   int i;
   if (node == NULL) {
@@ -328,7 +351,8 @@ void writeLeafBranch(MRTreeNode * node,
 }
 
 
-void writeMRForest() {
+void writeMRForest()
+{
   int i;
   SymbolList branch = createSymbolNode(hashTbl_find(""));
   SymbolNode * branch_tail = createSymbolNode(hashTbl_find(""));
@@ -348,7 +372,8 @@ void writeMRForest() {
  * Insert a child node of treeNode. 
  * The child node contains the given symbol.
  */
-void insertChild(MRTreeNode * treeNode, SymbolTblNode * symbol) {
+void insertChild(MRTreeNode * treeNode, SymbolTblNode * symbol)
+{
   MRTreeNode * child = createMRTreeNode(symbol);
   int leaf_index = isMRLeaf(treeNode);
 
@@ -372,7 +397,8 @@ void insertChild(MRTreeNode * treeNode, SymbolTblNode * symbol) {
  * forest already, just add the link between them.
  */
 void insertParentChildRelation(MRTreeNode * parent,
-                               MRTreeNode * child) {
+                               MRTreeNode * child)
+{
   int leaf_index;
 
   checkParentArraySize(child);
@@ -391,7 +417,8 @@ void insertParentChildRelation(MRTreeNode * parent,
 }
 
 
-void buildMultirootedTree() {
+void buildMultirootedTree()
+{
   MRTreeNode * lhs, * rhs;
   Grammar * g = & grammar;
   int i;
@@ -437,7 +464,8 @@ void buildMultirootedTree() {
  * Called by function getParentsForMRLeaf() only.
  */
 void getNode(int leaf_index, MRTreeNode * node, 
-             MRParents * parents) {
+             MRParents * parents)
+{
   if (node == NULL) {
     //printf("getNode warning: node is NULL\n");
     return;
@@ -472,7 +500,8 @@ void getNode(int leaf_index, MRTreeNode * node,
  *       so may not be very efficient.
  */
 void getParentsForMRLeaf(int leaf_index,
-        MRParents * parents) {
+        MRParents * parents)
+{
   int i;
   MRTreeNode * node = MRLeaves[leaf_index];
   if (node->parent_count == 0) return;
@@ -486,7 +515,8 @@ void getParentsForMRLeaf(int leaf_index,
 /*
  * Get all the parent nodes in the multi-rooted forest.
  */
-void getAllMRParents() {
+void getAllMRParents()
+{
   int i;
   leafIndexForParent_Done = FALSE;
 
@@ -503,7 +533,8 @@ void getAllMRParents() {
  * multi-rooted forest, as well as the leaf
  * of each parent in parenthesis.
  */
-void writeAllMRParents() {
+void writeAllMRParents()
+{
   int i;
   yyprintf("\n==all MR Parents (inside '()' is a corresponding leaf):\n");
   for (i = 0; i < all_parents->count; i ++) {
@@ -521,7 +552,8 @@ void writeAllMRParents() {
  * Pre-assumption: the list of parent nodes of the given
  * leaf is contained the array parents[].
  */
-void writeMRParents(MRTreeNode * leaf, MRParents * parents) {
+void writeMRParents(MRTreeNode * leaf, MRParents * parents)
+{
   int i;
   yyprintf2("parents for leaf '%s': ", 
             leaf->symbol->snode->symbol);
@@ -531,7 +563,3 @@ void writeMRParents(MRTreeNode * leaf, MRParents * parents) {
   }
   yyprintf("\n");
 }
-
-
-
-

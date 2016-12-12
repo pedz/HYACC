@@ -69,7 +69,8 @@ typedef struct {
 StateHashTblNode StateHashTbl[SHT_SIZE];
 
 
-StateNode * createStateNode(State * s) {
+StateNode * createStateNode(State * s)
+{
   StateNode * n;
   HYY_NEW(n, StateNode, 1);
   n->state = s;
@@ -78,12 +79,14 @@ StateNode * createStateNode(State * s) {
 }
 
 
-void destroyStateNode(StateNode * n) {
+void destroyStateNode(StateNode * n)
+{
   free(n);
 }
 
 
-void initStateHashTbl() {
+void initStateHashTbl()
+{
   int i;
   for (i = 0; i < SHT_SIZE; i ++) {
     StateHashTbl[i].count = 0;
@@ -92,7 +95,8 @@ void initStateHashTbl() {
 }
 
 
-static int getStateHashVal(State * s) {
+static int getStateHashVal(State * s)
+{
   int i, sum = 0;
   for (i = 0; i < s->core_config_count; i ++) {
     sum = (sum + s->config[i]->ruleID * 97 + 
@@ -109,7 +113,8 @@ extern BOOL in_lanetracing;
  * If not found, insert it and return NULL.
  * else, return the found state.
  */
-State * searchStateHashTbl(State * s, int * is_compatible) {
+State * searchStateHashTbl(State * s, int * is_compatible)
+{
   int v = getStateHashVal(s);
   StateNode * n = StateHashTbl[v].next;
   StateNode * n_prev;
@@ -152,7 +157,8 @@ State * searchStateHashTbl(State * s, int * is_compatible) {
  * Is similar to searchStateHashTbl, but does not use
  * weak compatibility.
  */
-State * searchSameStateHashTbl(State * s) {
+State * searchSameStateHashTbl(State * s)
+{
   int v = getStateHashVal(s);
   StateNode * n = StateHashTbl[v].next;
   StateNode * n_prev;
@@ -183,7 +189,8 @@ State * searchSameStateHashTbl(State * s) {
  * hash table cell usage: 
  *   number of used hash table cells / hash table size.
  */
-void StateHashTbl_dump() {
+void StateHashTbl_dump()
+{
   int i, states_count = 0, list_count = 0;
   StateNode * n;
 
@@ -218,6 +225,3 @@ void StateHashTbl_dump() {
             ((double) list_count)/SHT_SIZE);
 
 }
-
-
-
