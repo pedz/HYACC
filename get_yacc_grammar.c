@@ -94,7 +94,8 @@ void addRHSSymbol(SymbolTblNode * symbol);
  * Note: strcasecmp() is not an ANSI C function.
  * So use my own to be ANSI C compliant.
  */
-int y_strcasecmp(const char * a, const char * b) {
+int y_strcasecmp(const char * a, const char * b)
+{
   int len_a, len_b, len, i, cmp_val;
   len_a = strlen(a);
   len_b = strlen(b);
@@ -115,20 +116,20 @@ int y_strcasecmp(const char * a, const char * b) {
   return 0;
 }
 
-
-void init_terminal_property(SymbolTblNode * n) {
+void init_terminal_property(SymbolTblNode * n)
+{
   HYY_NEW(n->TP, struct TerminalProperty, 1);
   n->TP->precedence = 0;
   n->TP->assoc = _NONASSOC;
   n->TP->is_quoted = FALSE;
 }
 
-
 /*
  *  A valid identifier: [alph|_](alph|digit|_)*.
  *  where alph is [a-zA-Z], digit is [0-9].
  */
-BOOL validate_identifier(char * s) {
+BOOL validate_identifier(char * s)
+{
   int i;
   int len = strlen(s);
 
@@ -142,12 +143,12 @@ BOOL validate_identifier(char * s) {
   return TRUE;
 }
 
-
 /*
  * Assumption: n is a terminal, and n->TP != NULL.
  */
 void get_terminal_precedence(SymbolTblNode * n, 
-                             yacc_section1_state state) {
+                             yacc_section1_state state)
+{
   if (n->type != _TERMINAL || n->TP == NULL) return;
 
   if (state == IS_LEFT) {
@@ -162,11 +163,11 @@ void get_terminal_precedence(SymbolTblNode * n,
   }
 }
 
-
 /* 
  * Add a token to the tokens list.
  */
-void addToken(SymbolTblNode * n) {
+void addToken(SymbolTblNode * n)
+{
   if (tokens_tail == NULL) {
     tokens_tail = tokens = createSymbolNode(n);
   } else {
@@ -177,7 +178,22 @@ void addToken(SymbolTblNode * n) {
   tokens_ct ++;
 }
 
+static SymbolTblNode *get_symbol(symbol_type t)
+{
+  SymbolTblNode *n;
 
+  if (ysymbol_pt == 0)
+    return NULL;
+  
+  ysymbol[ysymbol_pt] = 0;
+  n = hashTbl_insert(ysymbol);
+  ysymbol_pt = 0;
+
+  if (t != _NEITHER)
+    n->type = t;
+  
+  return n;
+}
 
 /*
  * Used when process section 1 of the grammar file.
@@ -187,7 +203,9 @@ void addToken(SymbolTblNode * n) {
  * empty string is not allowed.
  */
 void output_terminal(yacc_section1_state state,
-                     yacc_section1_state prev_state) {
+		     yacc_section1_state prev_state,
+		     char *token_type)
+{
   SymbolTblNode * n;
   int add_token;
 
@@ -200,17 +218,18 @@ void output_terminal(yacc_section1_state state,
     return;
   }
 
-  ysymbol[ysymbol_pt] = 0;
-  n = hashTbl_insert(ysymbol);
-  ysymbol_pt = 0;
+  n = get_symbol(_NEITHER);
 
   switch (n->type) {
-  case _TERMINAL:
+  case _TERMINAL:		/* already entered */
     add_token = 0;
+    if (n->token_type == NULL && token_type != NULL)
+      n->token_type = token_type;
     break;
     
-  case _NEITHER:
+  case _NEITHER:		/* new symbol */
     n->type = _TERMINAL;
+    n->token_type = token_type;
     add_token = 1;
     break;
     
@@ -239,32 +258,21 @@ void output_terminal(yacc_section1_state state,
     get_terminal_precedence(n, state);
   }
 
-  if (add_token) addToken(n);
+  if (add_token)
+    addToken(n);
 }
 
-
-void get_start_symbol() {
-  if (ysymbol_pt == 0) return;
-
-  ysymbol[ysymbol_pt] = 0;
-  start_symbol = hashTbl_insert(ysymbol);
-  ysymbol_pt = 0;
-
-  start_symbol->type = _NONTERMINAL;
+void get_type_symbol(char *token_type)
+{
+  SymbolTblNode *n = get_symbol(_NONTERMINAL);
+  n->token_type = token_type;
 }
 
-
-void get_type_symbol() {
-  SymbolTblNode * n;
-  if (ysymbol_pt == 0) return;
-
-  ysymbol[ysymbol_pt] = 0;
-  n = hashTbl_insert(ysymbol);
-  ysymbol_pt = 0;
-
-  n->type = _NONTERMINAL;
+void get_start_symbol(char *token_type)
+{
+  start_symbol = get_symbol(_NONTERMINAL);
+  start_symbol->token_type = token_type;
 }
-
 
 /*
  * If more than one %expect value, use the first one.
@@ -272,7 +280,8 @@ void get_type_symbol() {
  * Note that atoi() function returns 0 if error occurs,
  * like when the ysymbol is a string "abc" and not a number.
  */
-void get_expect_sr_conflict() {
+void get_expect_sr_conflict()
+{
   if (ysymbol_pt == 0) return;
 
   ysymbol[ysymbol_pt] = 0;
@@ -299,12 +308,12 @@ void get_expect_sr_conflict() {
   ysymbol_pt = 0;
 }
 
-
 /*
  * Note: At this time, don't worry about whether the first
  * char of a symbol should be a letter.
  */
-void addCharToSymbol(int c) {
+void addCharToSymbol(int c)
+{
   if (ysymbol_pt >= ysymbol_size - 1) { // one more for '\0'.
     ysymbol_size *= 2;
 
@@ -324,12 +333,12 @@ void addCharToSymbol(int c) {
   ysymbol[ysymbol_pt ++] = c;
 }
 
-
 /*
  * Every occurence of "%left" or "%right" increases
  * the precedence by 1.
  */
-yacc_section1_state get_section1_state() {
+yacc_section1_state get_section1_state()
+{
   if (y_strcasecmp(ysymbol, "token") == 0) {
     return IS_TOKEN;
   } else if (y_strcasecmp(ysymbol, "start") == 0) {
@@ -358,8 +367,8 @@ yacc_section1_state get_section1_state() {
   }
 }
 
-
-static void my_perror(char * msg, int c) {
+static void my_perror(char * msg, int c)
+{
   printf("\nerror [line %d, col %d]: invalid char '%c'. %s\n",
          n_line, n_col, c, msg);
   exit(0);
@@ -372,9 +381,11 @@ static void my_perror(char * msg, int c) {
  *
  * Currently this only gets the "%start" line if there is one.
  */
-void processYaccFileInput_section1() {
+void processYaccFileInput_section1()
+{
   int c, last_c = '\n', last_last_c;
   yacc_section1_state state = IS_NONE, prev_state = -1;
+  char *token_type = NULL;
   int union_depth = 0;
   off_t union_start;
 
@@ -400,6 +411,7 @@ void processYaccFileInput_section1() {
       } else if (c == '}') {
         state = IS_NONE;
       } else if (isalpha(c)) { // %token, %left, ... etc.
+	token_type = NULL;
         state = IS_DIRECTIVE;
         addCharToSymbol(c);
       } else {
@@ -423,7 +435,7 @@ void processYaccFileInput_section1() {
     } else if (c == '/' && state != IS_QUOTED_TERMINAL) { 
       // '/' is not a valid char in a unquoted token.
       if (state == IS_TOKEN && ysymbol_pt > 0) {
-        output_terminal(state, prev_state);
+        output_terminal(state, prev_state, token_type);
       }
 
     } else if (state == IS_DIRECTIVE) {
@@ -445,7 +457,7 @@ void processYaccFileInput_section1() {
         if (c == '\'' && (last_c != '\\' ||
 			  (ysymbol_pt == 2 && ysymbol[0] == '\\'))) {
           //printf("] terminal ends\n");
-          output_terminal(state, prev_state); // output quoted terminal.
+          output_terminal(state, prev_state, token_type); // output quoted terminal.
           state = prev_state;
         } else if (! isspace(c)) {
           addCharToSymbol(c);
@@ -461,6 +473,14 @@ void processYaccFileInput_section1() {
         // process token type. to be implemented.
         ysymbol[ysymbol_pt] = 0;
         //printf("token type [%d, %d]: %s\n", n_line, n_col, ysymbol);
+
+	if ((token_type = malloc(sizeof(char) * (strlen(ysymbol) + 1))))
+	  strcpy(token_type, ysymbol);
+	else {
+	  printf("Out of memory\n");
+	  exit(1);
+	}
+
         ysymbol_pt = 0;
         state = prev_state;
       } else {
@@ -473,7 +493,7 @@ void processYaccFileInput_section1() {
       if (isspace(c) && ysymbol_pt == 0) {
         // do nothing, ignore space
       } else if (isspace(c)) { // output another token
-        output_terminal(state, prev_state);
+        output_terminal(state, prev_state, token_type);
       } else if (c == '\'') {
         //printf("terminal starts: ['");
         prev_state = state;
@@ -489,7 +509,7 @@ void processYaccFileInput_section1() {
       if (isspace(c) && ysymbol_pt == 0) {
         // do nothing, ignore space
       } else if (isspace(c)) { // output another non-terminal.
-        get_type_symbol();
+        get_type_symbol(token_type);
       } else if (c == '<') { // start of <token_type>.
         prev_state = state;
         state = IS_TOKEN_TYPE;
@@ -502,7 +522,7 @@ void processYaccFileInput_section1() {
       if (isspace(c) && ysymbol_pt == 0) {
         // do nothing, ignore space.
       } else if (isspace(c)) { // output start token
-        get_start_symbol(); // start symbol is a non-terminal.
+	get_start_symbol(token_type); // start symbol is a non-terminal.
       } else { // add char to token string.
         addCharToSymbol(c);
       }
@@ -571,7 +591,8 @@ void processYaccFileInput_section1() {
 /*
  * Used by function createNewRule().
  */
-Production * createEmptyProduction() {
+Production * createEmptyProduction()
+{
   Production * p = (Production *) malloc(sizeof(Production));
   if (p == NULL) {
     printf("createProduction error: output memory\n");
@@ -588,7 +609,8 @@ Production * createEmptyProduction() {
 }
 
 
-Production * createNewRule() {
+Production * createNewRule()
+{
   if (grammar.rule_count >= grammar.rule_max_count - 1) {
     grammar.rule_max_count *= 2;
     HYY_EXPAND(grammar.rules, Production *, grammar.rule_max_count);
@@ -611,7 +633,8 @@ Production * createNewRule() {
  * @return: the new created non-terminal, which will
  *          be inserted to the position of the mid-production action.
  */
-static void insert_mid_prod_rule(int ct) {
+static void insert_mid_prod_rule(int ct)
+{
   int ruleID;
   Production * p;
   char nameLHS[20];
@@ -636,14 +659,16 @@ static void insert_mid_prod_rule(int ct) {
 }
 
 
-void addLHSSymbol(SymbolTblNode * symbol) {
+void addLHSSymbol(SymbolTblNode * symbol)
+{
   //printf("\n==add LHS symbol: %s\n", symbol);
   Production * p = grammar.rules[grammar.rule_count - 1];
   p->nLHS = createSymbolNode(symbol);
 }
 
 
-void addRHSSymbol(SymbolTblNode * symbol) {
+void addRHSSymbol(SymbolTblNode * symbol)
+{
   //printf("\n==add RHS symbol: %s\n", symbol);
   SymbolNode * s;
   Production * p = grammar.rules[grammar.rule_count - 1];
@@ -666,7 +691,8 @@ void addRHSSymbol(SymbolTblNode * symbol) {
 /*
  * Assumption: symbol is the one after %prec in the RHS of p.
  */
-void getRHSPrecSymbol(char * symbol) {
+void getRHSPrecSymbol(char * symbol)
+{
   Production * p;
   SymbolTblNode * n = hashTbl_find(symbol);
   if (n == NULL) {
@@ -680,7 +706,8 @@ void getRHSPrecSymbol(char * symbol) {
 }
 
 
-void setHasCode() {
+void setHasCode()
+{
   grammar.rules[grammar.rule_count - 1]->hasCode = 1;
 }
 
@@ -694,7 +721,8 @@ void setHasCode() {
 // Functions to get grammar parameters. START.
 /////////////////////////////////////////////////////////////
 
-static BOOL isInVanishSymbolList(SymbolTblNode * n) {
+static BOOL isInVanishSymbolList(SymbolTblNode * n)
+{
   SymbolNode * a;
 
   //printf("isInVanishSymbolList input: %s\n", symbol);
@@ -711,7 +739,8 @@ static BOOL isInVanishSymbolList(SymbolTblNode * n) {
 /*
  * Used by the algorithm to find vanish symbol(s) of a grammar.
  */
-BOOL flagY(Production * p) {
+BOOL flagY(Production * p)
+{
   SymbolNode * a;
   for (a = p->nRHS_head; a != NULL; a = a->next) {
     if (isInVanishSymbolList(a->snode) == FALSE) return FALSE;
@@ -741,7 +770,8 @@ BOOL flagY(Production * p) {
  *   3. If any new symbols were flagged in step 2, go
  *      back to step 2.
  */
-void getVanishSymbols(Grammar * g) {
+void getVanishSymbols(Grammar * g)
+{
   SymbolNode * tail = NULL;
   int i, new_vanish_symbol_found;
   g->vanish_symbol_count = 0;
@@ -798,7 +828,8 @@ void getVanishSymbols(Grammar * g) {
  * some rules. If not, such invalid non-terminal will
  * be reported after getSymbolRuleIDList().
  */
-void getNonTerminals(Grammar * g) {
+void getNonTerminals(Grammar * g)
+{
   BOOL has_error = FALSE;
   int i, index = 0;
   SymbolNode * tail = NULL;
@@ -849,7 +880,8 @@ void getNonTerminals(Grammar * g) {
  * This function is called after getNonTerminals().
  * empty string is not included as terminal.
  */
-void getTerminals(Grammar * g) {
+void getTerminals(Grammar * g)
+{
   int i, j;
   char * symbol;
   SymbolNode * s, * tail = NULL;
@@ -886,7 +918,8 @@ void getTerminals(Grammar * g) {
 /*
  * ref: page 38. The C programming language.
  */
-char get_escape_char(int c) {
+char get_escape_char(int c)
+{
   switch (c) {
     case 'a': return '\a'; break;
     case 'b': return '\b'; break;
@@ -907,7 +940,8 @@ char get_escape_char(int c) {
 /*
  * Used by getTokensValue() only.
  */
-int get_token_value(char * s, int * index) {
+int get_token_value(char * s, int * index)
+{
   int val;
 
   if (strlen(s) == 1) return s[0]; // single letter.
@@ -952,7 +986,8 @@ int get_token_value(char * s, int * index) {
  * The tokens list can include those after %prec in the
  * rule section, which terminal list does not include.
  */
-void getTokensValue(Grammar * g) {
+void getTokensValue(Grammar * g)
+{
   int index = 0;
   SymbolNode * a;
   for (a = tokens; a != NULL; a = a->next) {
@@ -961,7 +996,8 @@ void getTokensValue(Grammar * g) {
 }
 
 
-void getGoalSymbol(Grammar * g) {
+void getGoalSymbol(Grammar * g)
+{
   g->goal_symbol = createSymbolNode(g->rules[0]->nLHS->snode);
 }
 
@@ -978,7 +1014,8 @@ void getGoalSymbol(Grammar * g) {
  * Since there are not many symbols, this will take
  * only very little time.
  */
-void getSymbolParsingTblCol(Grammar * g) {
+void getSymbolParsingTblCol(Grammar * g)
+{
   int i;
   SymbolTblNode * n;
   SymbolNode * a;
@@ -1003,7 +1040,8 @@ void getSymbolParsingTblCol(Grammar * g) {
  *  This plus the getSymbolParsingTblCol() function make it
  *  easy to refer between column number and column symbol.
  */
-void getParsingTblColHdr(Grammar * g) {
+void getParsingTblColHdr(Grammar * g)
+{
   SymbolNode * a;
 
   HYY_NEW(ParsingTblColHdr, SymbolTblNode *, 
@@ -1029,7 +1067,8 @@ void getParsingTblColHdr(Grammar * g) {
  * If a non-terminal is not the LHS of any rule,
  * it's an error and should be reported.
  */
-void getSymbolRuleIDList(Grammar * g) {
+void getSymbolRuleIDList(Grammar * g)
+{
   SymbolNode * a;
   SymbolTblNode * n;
   RuleIDNode * r, * tail;
@@ -1054,7 +1093,8 @@ void getSymbolRuleIDList(Grammar * g) {
 }
 
 
-void getGrammarUnitProductions(Grammar * g) {
+void getGrammarUnitProductions(Grammar * g)
+{
   int i;
   for (i = 0; i < g->rule_count; i ++) {
     if (grammar.rules[i]->RHS_count == 1 &&
@@ -1065,7 +1105,8 @@ void getGrammarUnitProductions(Grammar * g) {
 }
 
 
-void getGrammarParams() {
+void getGrammarParams()
+{
   getNonTerminals(& grammar);
   getTerminals(& grammar);
 
@@ -1109,7 +1150,8 @@ void getGrammarParams() {
  *
  * Empty string is not allowed.
  */
-SymbolTblNode * output_nonterminal(YACC_STATE state) {
+SymbolTblNode * output_nonterminal(YACC_STATE state)
+{
   SymbolTblNode * n;
 
   if (ysymbol_pt == 0) { 
@@ -1188,7 +1230,8 @@ SymbolTblNode * output_nonterminal(YACC_STATE state) {
  * To be used by the next rule with the same LHS in cases like:
  *   LHS : RHS1 | RHS2 ...
  */
-void getCurLHS(SymbolTblNode * n) {
+void getCurLHS(SymbolTblNode * n)
+{
   if (n == NULL) {
     printf("error [line %d, col %d]: LHS symbol is empty.\n",
             n_line, n_col);
@@ -1202,7 +1245,8 @@ void getCurLHS(SymbolTblNode * n) {
  * Processes section 2 (grammar section)
  * of a yacc input file.
  */
-void processYaccFileInput_section2() {
+void processYaccFileInput_section2()
+{
   // for mid-production actions.
   int mid_prod_code_ct = 0;
   BOOL END_OF_CODE = FALSE;
@@ -1402,7 +1446,8 @@ void processYaccFileInput_section2() {
  * Otherwise, use the LHS of the first user rule as the
  * RHS of goal production.
  */
-void getGoalRuleRHS() {
+void getGoalRuleRHS()
+{
   if (grammar.rule_count > 1) {
     if (start_symbol != NULL) {
       grammar.rules[0]->nRHS_head = grammar.rules[0]->nRHS_tail =
@@ -1419,8 +1464,8 @@ void getGoalRuleRHS() {
   }
 }
 
-
-void getGoalRuleLHS() {
+void getGoalRuleLHS()
+{
   SymbolTblNode * n = hashTbl_insert(strAccept);
   createNewRule(); // goal production rule.
   grammar.rules[0]->nLHS = createSymbolNode(n);
@@ -1435,7 +1480,8 @@ void getGoalRuleLHS() {
  * convert them to non-unit productions. This place holder
  * nonterminal will reduce to empty string.
  */
-void post_modification(Grammar * g) {
+void post_modification(Grammar * g)
+{
   int count = 0, i;
   Production * p;
   SymbolTblNode * n;
@@ -1473,7 +1519,8 @@ void post_modification(Grammar * g) {
 }
 
 
-void get_yacc_grammar_init() {
+void get_yacc_grammar_init()
+{
   // insert special symbols to hash table.
   SymbolTblNode * n = hashTbl_insert(strEnd); // end marker of production.
   n->type = _TERMINAL;
@@ -1504,7 +1551,8 @@ void get_yacc_grammar_init() {
  *
  * Called by function main() in y.c.
  */
-void getYaccGrammar(char * infile) {
+void getYaccGrammar(char * infile)
+{
 #if DEBUG_YACC_INPUT_PARSER
   printf("input file: %s\n", infile);
 #endif
@@ -1534,4 +1582,3 @@ void getYaccGrammar(char * infile) {
   //writeGrammar(& grammar); exit(0);
 
 }
-

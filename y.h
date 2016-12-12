@@ -183,6 +183,7 @@ struct SymbolTableNode {
   int seq; /* sequence (column) number in parsing table. */
   RuleIDNode * ruleIDList;
   struct SymbolTableNode * next;
+  char *token_type;
 };
 typedef struct SymbolTableNode SymbolTblNode;
 
@@ -725,4 +726,3 @@ extern void writeConflictingContext(int state_no); // for debug.
 extern BOOL in_lanetracing;
 
 #endif
-

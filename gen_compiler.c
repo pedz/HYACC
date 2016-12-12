@@ -48,7 +48,8 @@ static char *yystype_format =
   "#endif\n"
   ;
 
-static void prepare_outfile() {
+static void prepare_outfile()
+{
   if ((fp = fopen(y_tab_c, "w")) == NULL) {
     printf("Cannot open output file %s\n", y_tab_c);
     exit(0);
@@ -63,7 +64,8 @@ static void prepare_outfile() {
 }
 
 
-static void my_perror(char * msg, int c) {
+static void my_perror(char * msg, int c)
+{
   printf("\nerror [line %d, col %d]: invalid char '%c'. %s\n",
          n_line, n_col, c, msg);
   exit(1);
@@ -76,7 +78,8 @@ static void my_perror(char * msg, int c) {
 /*
  * Token - terminal symbols.
  */
-void writeTokens() {
+void writeTokens()
+{
   int i;
   SymbolNode * a;
   for (a = tokens, i = 0; a != NULL; a = a->next, i ++) {
@@ -88,7 +91,8 @@ void writeTokens() {
 /*
  *  Write all terminal tokens that are not quoted, and not "error".
  */
-void writeTokensToCompilerFile() {
+void writeTokensToCompilerFile()
+{
   int i, index = 0;
   SymbolNode * a;
   
@@ -116,7 +120,8 @@ void writeTokensToCompilerFile() {
  *  Get code declarations from section 1, write to 
  *  y.tab.c, and write token declarations too.
  */
-void processYaccFile_section1() {
+void processYaccFile_section1()
+{
   int c, last_c = '\n', last_last_c;
   BOOL IS_CODE = FALSE;
 
@@ -153,7 +158,8 @@ void processYaccFile_section1() {
 /*
  * rewind to section 2.
  */
-static void goto_section2() {
+static void goto_section2()
+{
   int c, last_c = 0, last_last_c = '\n';
 
   fseek(fp_yacc, 0L, 0); // go to the beginning of file fp.
@@ -173,7 +179,8 @@ static void goto_section2() {
  * Pass section 2, go to section 3.
  * Presumption: finished section 1, entering section 2.
  */
-static void goto_section3() {
+static void goto_section3()
+{
   int c, last_c = 0, last_last_c = '\n';
 
   while ((c = getc(fp_yacc)) != EOF) {
@@ -195,7 +202,8 @@ static void goto_section3() {
  * The purpose here is to extract the code for semantic 
  * actions of rules.
  */
-static void processYaccFile_section2(char * filename) {
+static void processYaccFile_section2(char * filename)
+{
   YACC_STATE state = LHS;
   int CODE_LEVEL;
   BOOL READING_SYMBOL = FALSE;
@@ -314,16 +322,59 @@ static void processYaccFile_section2(char * filename) {
         if (last_c != '$' && c == '$') {
           // do nothing, this may be a special character.
         } else if (last_c == '$' && c == '$') {
-          fprintf(fp, "yyval");
+	  Production *rule;
+	  SymbolNode *lhs;
+	  SymbolTblNode *foo;
+	  char *token_type;
+	  int full_rule;
+
+	  /* Find the actual full rule */
+	  for (full_rule = rule_count;
+	       (rule = grammar.rules[full_rule]) && (rule->RHS_count == 0) && (full_rule < grammar.rule_count);
+	       ++full_rule);
+	  if (!(rule &&
+		(lhs = rule->nLHS) &&
+		(foo = lhs->snode))) {
+	    printf("Can't find lhs rule starting from %d\n", rule_count);
+	    exit(1);
+	  }
+
+	  if ((token_type = foo->token_type))
+	    fprintf(fp, "(yyval.%s)", token_type);
+	  else
+	    fprintf(fp, "yyval");
+
         } else if (last_c == '$' && isdigit(c)) {
           READING_NUMBER = TRUE; 
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && isdigit(c)) {
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
-          fprintf(fp, "yypvt[%d]", dollar_number - 
-                  grammar.rules[rule_count]->RHS_count);
-          putc(c, fp);
+	  Production *rule;
+	  SymbolNode *rhs;
+	  SymbolTblNode *sym;
+	  char *token_type;
+	  int full_rule;
+	  int i;
+
+	  for (full_rule = rule_count;
+	       (rule = grammar.rules[full_rule]) && (rule->RHS_count == 0) && (full_rule < grammar.rule_count);
+	       ++full_rule);
+	  if (!(rule &&
+		(rhs = rule->nRHS_head))) {
+	    printf("Can't find rhs rule starting from %d\n", rule_count);
+	    exit(1);
+	  }
+	  for (i = 1; (i < dollar_number) && rhs; ++i, rhs = rhs->next);
+	  if (!rhs)
+	    fprintf(fp, "/* Hmm... we ran out of RHS %d %d */", rule_count, full_rule);
+	  if (rhs &&
+	      (sym = rhs->snode) &&
+	      (token_type = sym->token_type))
+	    fprintf(fp, "(yypvt[%d].%s)", dollar_number - rule->RHS_count, token_type);
+	  else
+	    fprintf(fp, "yypvt[%d]", dollar_number - rule->RHS_count);
+
           READING_NUMBER = FALSE;
           dollar_number = 0;
         } else {
@@ -388,7 +439,8 @@ static void processYaccFile_section2(char * filename) {
 }
 
 
-void processYaccFile_section3() {
+void processYaccFile_section3()
+{
   int c;
   while((c = getc(fp_yacc)) != EOF) {
     putc(c, fp);
@@ -399,7 +451,8 @@ void processYaccFile_section3() {
 /*
  * Copy code from resource files into output file.
  */
-void copy_src_file(char * filename) {
+void copy_src_file(char * filename)
+{
   int c;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
@@ -417,7 +470,8 @@ void copy_src_file(char * filename) {
  * This is for the purpose of inserting code 
  * associated with reductions.
  */
-void copy_yaccpar_file_1(char * filename) {
+void copy_yaccpar_file_1(char * filename)
+{
   int c, last_c = 0;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
@@ -435,7 +489,8 @@ void copy_yaccpar_file_1(char * filename) {
 }
 
 
-void copy_yaccpar_file_2(char * filename) {
+void copy_yaccpar_file_2(char * filename)
+{
   int c, last_c = 0;
   FILE * fp_src;
   if ((fp_src = fopen(filename, "r")) == NULL) {
@@ -460,7 +515,8 @@ void copy_yaccpar_file_2(char * filename) {
 static char * indent = "    "; // indentation.
 
 
-int getIndexInTokensArray(SymbolTblNode * s) {
+int getIndexInTokensArray(SymbolTblNode * s)
+{
   SymbolNode * a;
   int i;
   for (a = tokens, i = 0; a != NULL; a = a->next, i ++) {
@@ -475,7 +531,8 @@ int getIndexInTokensArray(SymbolTblNode * s) {
  * non-terminal array of the given grammar.
  * Used in gen_compiler.c.
  */
-int getNonTerminalIndex(SymbolTblNode * snode) {
+int getNonTerminalIndex(SymbolTblNode * snode)
+{
   SymbolNode * a;
   int i = 0;
 
@@ -496,7 +553,8 @@ int getNonTerminalIndex(SymbolTblNode * snode) {
  * the LHS are replaced with leaf terminals in the 
  * multi-rooted trees.
  */
-void print_yyr1() {
+void print_yyr1()
+{
   int i;
   fprintf(fp, "static YYCONST yytabelem yyr1[] = {\n");
   // First rule is always "$accept : ...".
@@ -534,7 +592,8 @@ void print_yyr1() {
  *     with this rule (y = 1 for yes, y = 0 for no).
  *   then yyr2[i] = (x << 1) + y;
  */
-void print_yyr2() {
+void print_yyr2()
+{
   int i;
   fprintf(fp, "static YYCONST yytabelem yyr2[] = {\n");
   fprintf(fp, "%6d,", 0);
@@ -548,7 +607,8 @@ void print_yyr2() {
 }
 
 
-void print_yynonterminals() {
+void print_yynonterminals()
+{
   int i;
   SymbolNode * a;
   fprintf(fp, "yytoktype yynts[] = {\n");
@@ -566,7 +626,8 @@ void print_yynonterminals() {
 /*
  * Print terminal tokens.
  */
-void print_yytoks() {
+void print_yytoks()
+{
   int i, index;
   SymbolNode * a;
 
@@ -594,7 +655,8 @@ void print_yytoks() {
 /*
  * Print reductions.
  */
-void print_yyreds() {
+void print_yyreds()
+{
   int i, j;
   char * symbol;
   SymbolNode * a;
@@ -624,7 +686,8 @@ void print_yyreds() {
 }
 
 
-void print_yytoken() {
+void print_yytoken()
+{
   int i;
   SymbolNode * a;
 
@@ -638,7 +701,8 @@ void print_yytoken() {
 }
 
 
-void print_parsing_tbl_entry(char action, int state_no, int * count) {
+void print_parsing_tbl_entry(char action, int state_no, int * count)
+{
   BOOL isEntry = FALSE;
   if (action == 's' || action == 'g') {
     fprintf(fp, "%d, ", state_no); // state to go.
@@ -664,7 +728,8 @@ void print_parsing_tbl_entry(char action, int state_no, int * count) {
  * if it is negative, it's a reduce;
  * if it's zero, it's accept.
  */
-void print_parsing_tbl() {
+void print_parsing_tbl()
+{
   int i, j, row, col;
   int col_size = ParsingTblCols;
   char action;
@@ -745,7 +810,8 @@ void print_parsing_tbl() {
 
 
 void print_parsing_tbl_col_entry(
-       char action, int token_value, int * count) {
+       char action, int token_value, int * count)
+{
   BOOL isEntry = FALSE;
   if (action == 's' || action == 'g' || action == 'r' || action == 'a') {
     fprintf(fp, "%d, ", token_value); // state to go.
@@ -766,7 +832,8 @@ void print_parsing_tbl_col_entry(
  * if it's > 256, it's a token;
  * if it's < 0, it's a non-terminal.
  */
-void print_parsing_tbl_col() {
+void print_parsing_tbl_col()
+{
   int i, j, row, col, count = 0;
   int col_size = ParsingTblCols;
   char action;
@@ -821,7 +888,8 @@ void print_parsing_tbl_col() {
  * Find those states that only have a single reduce action.
  * Refer: Pager July, 72', Tech Rpt PE 259. Measure 3.
  */
-void getFinalStates() {
+void getFinalStates()
+{
   int i, j;
   fprintf(fp, "static YYCONST yytabelem yyfs[] = {\n");
   fprintf(fp, "%d", final_state_list[0]);
@@ -839,13 +907,15 @@ void getFinalStates() {
 }
 
 
-BOOL useLRK() {
+BOOL useLRK()
+{
   return USE_LR_K == TRUE &&
          (lrk_pt_array != NULL && lrk_pt_array->max_k >= 2);
 }
 
 
-void write_LRK_table_arrays() {
+void write_LRK_table_arrays()
+{
   int i, j;
   LRk_P_T * t;
   LRk_P_T_row * r;
@@ -930,7 +1000,8 @@ void write_LRK_table_arrays() {
  * write the generated parsing table into the arrays
  * used by the driver code.
  */
-void write_parsing_table_arrays() {
+void write_parsing_table_arrays()
+{
   getFinalStates();
 
   print_parsing_tbl_col(); // yytbltok[]
@@ -967,7 +1038,8 @@ void write_parsing_table_arrays() {
 ///////////////////////////////////////////////////////
 
 
-void write_special_info() {
+void write_special_info()
+{
   fprintf(fp, "\n");
   fprintf(fp, "#ifndef yylval\n");
   fprintf(fp, "YYSTYPE yylval;\n");
@@ -980,7 +1052,8 @@ void write_special_info() {
 /*
  * Do this is use LR(k).
  */
-void get_LRK_HYACC_PATH() {
+void get_LRK_HYACC_PATH()
+{
   if (useLRK()) {
     char * tmp;
     puts("lrk used");
@@ -994,7 +1067,8 @@ void get_LRK_HYACC_PATH() {
 }
 
 
-void generate_compiler(char * infile) {
+void generate_compiler(char * infile)
+{
   if ((fp_yacc = fopen(infile, "r")) == NULL) {
     printf("error: can't open file %s\n", infile);
     exit(1);
