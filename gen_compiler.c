@@ -40,6 +40,8 @@ static FILE * fp_h; // for y.tab.h
 static int n_line; // count number of lines in yacc input file.
 static int n_col;
 
+#define MAX_RULE_LENGTH 0xfffff
+
 char *yystype_definition = "typedef int YYSTYPE;";
 static char *yystype_format =
   "#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED\n"
@@ -193,6 +195,41 @@ static void goto_section3()
   }
 }
 
+static SymbolTblNode *find_full_rule(int rule_count, int dollar_number)
+{
+  Production *rule;
+  SymbolNode *node;
+  SymbolTblNode *sym;
+  int full_rule;
+  int i;
+
+  for (full_rule = rule_count; full_rule < grammar.rule_count; ++full_rule) {
+
+    if ((rule = grammar.rules[full_rule]) &&
+	(node = rule->nLHS) &&
+	(sym = node->snode)) {
+      if (strncmp("$$", sym->symbol, 2)) /* node symbol starting with $$ we continue */
+	break;
+    } else {
+      printf("Malformed grammar rule at index %d\n", full_rule);
+      exit(1);
+    }
+  }
+
+  if (dollar_number == MAX_RULE_LENGTH)
+    return sym;
+
+  for (i = 1, node = rule->nRHS_head; i < dollar_number && node; ++i, node = node->next);
+  if (i != dollar_number) {
+    printf("Rule %d terminated before %d RHS\n", full_rule, dollar_number);
+    exit(1);
+  }
+  if (!(sym = node->snode)) {
+    printf("Malformed grammar rule %d RHS %d had no symbol table node\n", full_rule, dollar_number);
+    exit(1);
+  }
+  return sym;
+}
 
 /*
  * Basically, this has the same structure as function
@@ -322,24 +359,10 @@ static void processYaccFile_section2(char * filename)
         if (last_c != '$' && c == '$') {
           // do nothing, this may be a special character.
         } else if (last_c == '$' && c == '$') {
-	  Production *rule;
-	  SymbolNode *lhs;
-	  SymbolTblNode *foo;
+	  SymbolTblNode *sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
 	  char *token_type;
-	  int full_rule;
 
-	  /* Find the actual full rule */
-	  for (full_rule = rule_count;
-	       (rule = grammar.rules[full_rule]) && (rule->RHS_count == 0) && (full_rule < grammar.rule_count);
-	       ++full_rule);
-	  if (!(rule &&
-		(lhs = rule->nLHS) &&
-		(foo = lhs->snode))) {
-	    printf("Can't find lhs rule starting from %d\n", rule_count);
-	    exit(1);
-	  }
-
-	  if ((token_type = foo->token_type))
+	  if ((token_type = sym->token_type))
 	    fprintf(fp, "(yyval.%s)", token_type);
 	  else
 	    fprintf(fp, "yyval");
@@ -350,31 +373,16 @@ static void processYaccFile_section2(char * filename)
         } else if (READING_NUMBER == TRUE && isdigit(c)) {
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
-	  Production *rule;
-	  SymbolNode *rhs;
-	  SymbolTblNode *sym;
+	  int RHS_count = grammar.rules[rule_count]->RHS_count;
+	  SymbolTblNode *sym = find_full_rule(rule_count, dollar_number);
 	  char *token_type;
-	  int full_rule;
-	  int i;
-
-	  for (full_rule = rule_count;
-	       (rule = grammar.rules[full_rule]) && (rule->RHS_count == 0) && (full_rule < grammar.rule_count);
-	       ++full_rule);
-	  if (!(rule &&
-		(rhs = rule->nRHS_head))) {
-	    printf("Can't find rhs rule starting from %d\n", rule_count);
-	    exit(1);
-	  }
-	  for (i = 1; (i < dollar_number) && rhs; ++i, rhs = rhs->next);
-	  if (!rhs)
-	    fprintf(fp, "/* Hmm... we ran out of RHS %d %d */", rule_count, full_rule);
-	  if (rhs &&
-	      (sym = rhs->snode) &&
-	      (token_type = sym->token_type))
-	    fprintf(fp, "(yypvt[%d].%s)", dollar_number - rule->RHS_count, token_type);
+	  
+	  if ((token_type = sym->token_type))
+	    fprintf(fp, "(yypvt[%d].%s)", dollar_number - RHS_count, token_type);
 	  else
-	    fprintf(fp, "yypvt[%d]", dollar_number - rule->RHS_count);
+	    fprintf(fp, "yypvt[%d]", dollar_number - RHS_count);
 
+          putc(c, fp);
           READING_NUMBER = FALSE;
           dollar_number = 0;
         } else {
