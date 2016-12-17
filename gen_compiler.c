@@ -647,8 +647,8 @@ void print_yytoks()
 
     if (strlen(a->snode->symbol) == 2 && 
         a->snode->symbol[0] == '\\') { // escape sequence
-      fprintf(fp, "\t\"\\%s\",\t%d,\n", a->snode->symbol,
-                                      a->snode->value);
+      fprintf(fp, "\t\"\\\\%s\",\t%d,\n", a->snode->symbol,
+                                        a->snode->value);
     } else {
       fprintf(fp, "\t\"%s\",\t%d,\n", a->snode->symbol, 
                                       a->snode->value);
