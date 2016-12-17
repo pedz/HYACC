@@ -99,16 +99,16 @@ char * yyget_tok(const int yychar)
   return "-none-";
 }
 
-void yywrite_stack()
+void yywrite_stack(void)
 { 
   int i; 
   /* It's unknown what data type yypv is, so can't write here. */ 
   /* The user can customize the code here himself. */ 
   /* fprintf(yyparse_fp, "value stack: "); 
-  for (i = 0; i < yypv_pt - 1; i ++) 
-    fprintf(yyparse_fp, "%d, ", yypv[i]); 
-  if (yypv_pt > 0) fprintf(yyparse_fp, "%d", yypv[i]); 
-  fprintf(yyparse_fp, "\n"); 
+     for (i = 0; i < yypv_pt - 1; i ++) 
+     fprintf(yyparse_fp, "%d, ", yypv[i]); 
+     if (yypv_pt > 0) fprintf(yyparse_fp, "%d", yypv[i]); 
+     fprintf(yyparse_fp, "\n"); 
   */
 
   fprintf(yyparse_fp, "symbol stack: ");
@@ -135,19 +135,19 @@ void yywrite_stack()
 
 #define YYEXPAND_STACK \
 { \
-  if (yyps_pt >= YYMAX_STACK_CAPACITY) { \
-    printf("YYEXPAND_STACK error: YYMAX_STACK_CAPACITY reached.\n"); \
-    exit(1); \
-  } \
-  if (yyps_pt >= yystack_capacity) { \
-    yystack_capacity *= 2; \
-    if ((yyps = YYENLARGE(yyps, int)) == NULL) \
-      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n"); \
-    if ((yypv = YYENLARGE(yypv, YYSTYPE)) == NULL) \
-      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n"); \
-    YYEXPAND_SYMBOL_STACK \
-    /*printf("stack size expanded to %d\n", yystack_capacity); */ \
-  } \
+  if (yyps_pt >= YYMAX_STACK_CAPACITY) {				\
+    printf("YYEXPAND_STACK error: YYMAX_STACK_CAPACITY reached.\n");	\
+    exit(1);								\
+  }									\
+  if (yyps_pt >= yystack_capacity) {					\
+    yystack_capacity *= 2;						\
+    if ((yyps = YYENLARGE(yyps, int)) == NULL)				\
+      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n");		\
+    if ((yypv = YYENLARGE(yypv, YYSTYPE)) == NULL)			\
+      YYERR_EXIT("YYEXPAND_STACK error: out of memory\n");		\
+    YYEXPAND_SYMBOL_STACK						\
+    /*printf("stack size expanded to %d\n", yystack_capacity); */	\
+  }									\
 }
 
 
@@ -164,17 +164,17 @@ void yywrite_stack()
  */
 #define YYGET_ACTION(state, token, action) \
 { \
-  /* offset_h to (offset_t - 1) is the range to search. */ \
-  int offset_h = yyrowoffset[state]; \
-  int offset_t = yyrowoffset[state + 1]; \
-  \
-  /* now use linear search. Will change to binary search. */ \
-  int offset; \
-  for (offset = offset_h; offset < offset_t; offset ++) \
-    if (yyptbltok[offset] == token) break; \
-  \
-  if (offset == offset_t) action = YYNOACTION; \
-  else action = yyptblact[offset]; \
+  /* offset_h to (offset_t - 1) is the range to search. */	\
+  int offset_h = yyrowoffset[state];				\
+  int offset_t = yyrowoffset[state + 1];			\
+								\
+  /* now use linear search. Will change to binary search. */	\
+  int offset;							\
+  for (offset = offset_h; offset < offset_t; offset ++)		\
+    if (yyptbltok[offset] == token) break;			\
+								\
+  if (offset == offset_t) action = YYNOACTION;			\
+  else action = yyptblact[offset];				\
 }
 
 
@@ -187,69 +187,69 @@ int yyerror_handler(int yystate)
 {
   int yyaction;
   switch (yyerrflag) {
-    case 0:
-      yyerror("syntax error"); 
+  case 0:
+    yyerror("syntax error"); 
 #if YYDEBUG
-      fprintf(yyparse_fp, "syntax error: \
+    fprintf(yyparse_fp, "syntax error: \
         no action exists for state/token pair (%d, %s).\n",
-        yystate, yyget_tok(yychar)); 
+	    yystate, yyget_tok(yychar)); 
 #endif
-      goto skip_init;
-    yyerrlab: /* we have a user generated syntax type error */
-    skip_init:
-      yynerrs ++;
-    case 1:
-    case 2: /* incompletely recovered error */
-      yyerrflag = 3; /* ! */
-      /* find state where "error" is a legal shift action */
-      while (yyps_pt > 0) { /* while state stack is not empty. */
+    goto skip_init;
+
+  skip_init:
+    yynerrs ++;
+  case 1:
+  case 2: /* incompletely recovered error */
+    yyerrflag = 3; /* ! */
+    /* find state where "error" is a legal shift action */
+    while (yyps_pt > 0) { /* while state stack is not empty. */
 #if YYDEBUG
-        fprintf(yyparse_fp, 
-                "look for error action on state %d\n", yystate);
+      fprintf(yyparse_fp, 
+	      "look for error action on state %d\n", yystate);
 #endif
-        YYGET_ACTION(yystate, YYERRCODE, yyaction);
-        if (yyaction > 0) { /* shift on "error" found for yystate. */
-          /* simulate shift for "error" token. */
-          /* push target state on state stack. */
-          * (yyps + yyps_pt) = yyaction; 
-          if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
-          * (yypv + yypv_pt) = yyval; /* should not matter */
-          yypv_pt ++;
+      YYGET_ACTION(yystate, YYERRCODE, yyaction);
+      if (yyaction > 0) { /* shift on "error" found for yystate. */
+	/* simulate shift for "error" token. */
+	/* push target state on state stack. */
+	* (yyps + yyps_pt) = yyaction; 
+	if (++ yyps_pt == yystack_capacity) YYEXPAND_STACK; 
+	* (yypv + yypv_pt) = yyval; /* should not matter */
+	yypv_pt ++;
 #if YYDEBUG
-          * (yypm + yypm_pt) = YYERRCODE;
-          yypm_pt ++;
-          fprintf(yyparse_fp, "- shift on error\n");
+	* (yypm + yypm_pt) = YYERRCODE;
+	yypm_pt ++;
+	fprintf(yyparse_fp, "- shift on error\n");
 #endif
-          return 0; /* return control to yyparse(), resume parsing. */
-        } else {    /* no error shift action found, pop this state. */
+	return 0; /* return control to yyparse(), resume parsing. */
+      } else {    /* no error shift action found, pop this state. */
 #if YYDEBUG
-          fprintf(yyparse_fp, 
-                  "- pop state %d\n", * (yyps + yyps_pt - 1));
+	fprintf(yyparse_fp, 
+		"- pop state %d\n", * (yyps + yyps_pt - 1));
 #endif
-          yyps_pt --; /* pop state stack. */
-          yypv_pt --; /* pop value stack. */
+	yyps_pt --; /* pop state stack. */
+	yypv_pt --; /* pop value stack. */
 #if YYDEBUG
-          yypm_pt --;
-          yywrite_stack();
+	yypm_pt --;
+	yywrite_stack();
 #endif
-          yystate = * (yyps + yyps_pt - 1); /* get current state. */
-        }
+	yystate = * (yyps + yyps_pt - 1); /* get current state. */
       }
-      /* the state stack is empty now, no error shift action found. */
+    }
+    /* the state stack is empty now, no error shift action found. */
 #if YYDEBUG
-      fprintf(yyparse_fp, "state stack is empty. abort.\n");
+    fprintf(yyparse_fp, "state stack is empty. abort.\n");
 #endif
-      return -1; /* yyparse return 1. */
-    case 3: /* no shift yet, eat a token */
-      if (yychar == YYEOF) return -1; /* yyparse() ABORT. */
+    return -1; /* yyparse return 1. */
+  case 3: /* no shift yet, eat a token */
+    if (yychar == YYEOF) return -1; /* yyparse() ABORT. */
 #if YYDEBUG
-      fprintf(yyparse_fp, "eat token %s\n", yyget_tok(yychar));
+    fprintf(yyparse_fp, "eat token %s\n", yyget_tok(yychar));
 #endif
-      /* discard lookahead, resume parsing. */
-      yychar = -1; /* eat this token and read next symbol. */
-      return 1; 
-    default:
-      YYERR_EXIT("yyerror_handler error: \
+    /* discard lookahead, resume parsing. */
+    yychar = -1; /* eat this token and read next symbol. */
+    return 1; 
+  default:
+    YYERR_EXIT("yyerror_handler error: \
                  yyerrflag > 3 (should be 0~3)\n");
   } /* end of switch. */
 } /* end of yyerror_handler(). */
@@ -328,6 +328,7 @@ int yyparse()
       if (yyerrflag > 0) yyerrflag --; 
 
     } else if (yyaction == YYNOACTION) { /* no action found. error */
+    yyerrlab: /* we have a user generated syntax type error */
       yyerr_hdl = yyerror_handler(yystate); 
       if (yyerr_hdl == -1) break; /* YYABORT; */
       else if (yyerr_hdl == 1) continue; /* eat a token. */
@@ -348,7 +349,7 @@ int yyparse()
       if ((yyr2[yyaction] & 1) == 1) { /* output associated code. */
         switch(yyaction) { 
           $A
-        }
+	    }
       } 
 
       yyps_pt -= yy_rhs_ct; /* pop yy_rhs_ct states from state stack. */
@@ -371,7 +372,7 @@ int yyparse()
       yypm_pt ++;
 
       fprintf(yyparse_fp, "after reduction: goto state=%d, lookahead=%s\n",
-             * (yyps + yyps_pt - 1), yyget_tok(yychar));
+	      * (yyps + yyps_pt - 1), yyget_tok(yychar));
 #endif
 
     } else if (yyaction == 0) { /* is accept */
