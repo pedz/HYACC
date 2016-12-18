@@ -118,8 +118,10 @@ void writeTokensToCompilerFile()
   }
 
   fprintf(fp, yystype_format, yystype_definition);
-  if (USE_HEADER_FILE)
+  if (USE_HEADER_FILE) {
     fprintf(fp_h, yystype_format, yystype_definition);
+    fprintf(fp_h, "\nextern YYSTYPE yylval;\n");
+  }
 }
 
 
