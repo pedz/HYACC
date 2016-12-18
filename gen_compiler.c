@@ -423,9 +423,9 @@ static void processYaccFile_section2(char * filename)
 	    token_type = sym->token_type;
 	  }
 	  if (token_type)
-	    fprintf(fp, "(yypvt[%d].%s)", (dollar_number - RHS_count), token_type);
+	    fprintf(fp, "(yypvt[%d].%s)/* %d %d */", (dollar_number - RHS_count), token_type, rule_count, RHS_count);
 	  else
-	    fprintf(fp, "yypvt[%d]", dollar_number - RHS_count);
+	    fprintf(fp, "yypvt[%d]/* %d %d */", dollar_number - RHS_count, rule_count, RHS_count);
 
           putc(c, fp);
           READING_NUMBER = FALSE;

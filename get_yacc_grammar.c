@@ -646,7 +646,7 @@ static void insert_mid_prod_rule(int ct)
   ruleID = grammar.rule_count - 1; // last rule's pointer.
   o = grammar.rules[ruleID - 1];
   p = grammar.rules[ruleID];
-  grammar.rules[ruleID] = grammar.rules[ruleID - 1];
+  grammar.rules[ruleID]     = o;
   grammar.rules[ruleID - 1] = p;
 
   // now fill the value of the new added rule.
@@ -656,7 +656,7 @@ static void insert_mid_prod_rule(int ct)
   p->nLHS = createSymbolNode(n); 
   p->hasCode = 1;
   addRHSSymbol(n);
-  p->RHS_count = o->RHS_count;
+  p->RHS_count = o->RHS_count + 1;
 }
 
 
