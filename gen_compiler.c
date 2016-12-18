@@ -1081,11 +1081,7 @@ void write_parsing_table_arrays()
 
 void write_special_info()
 {
-  fprintf(fp, "\n");
-  fprintf(fp, "#ifndef yylval\n");
-  fprintf(fp, "YYSTYPE yylval;\n");
-  fprintf(fp, "#endif\n\n");
-
+  fprintf(fp, "\nYYSTYPE yylval;\n");
   if (USE_YYDEBUG) { fprintf(fp, "\n#define YYDEBUG 1\n"); }
 }
 
