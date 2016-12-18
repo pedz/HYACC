@@ -411,6 +411,8 @@ static void processYaccFile_section2(char * filename)
         } else if (READING_NUMBER == TRUE && isdigit(c)) {
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
+	  int RHS_count = grammar.rules[rule_count]->RHS_count;
+
 	  rule = find_full_rule(rule_count);
 	  
 	  if (explicit_type) {
@@ -421,9 +423,9 @@ static void processYaccFile_section2(char * filename)
 	    token_type = sym->token_type;
 	  }
 	  if (token_type)
-	    fprintf(fp, "(yypvt[%d].%s)", (dollar_number - rule->RHS_count), token_type);
+	    fprintf(fp, "(yypvt[%d].%s)", (dollar_number - RHS_count), token_type);
 	  else
-	    fprintf(fp, "yypvt[%d]", dollar_number - rule->RHS_count);
+	    fprintf(fp, "yypvt[%d]", dollar_number - RHS_count);
 
           putc(c, fp);
           READING_NUMBER = FALSE;

@@ -654,6 +654,7 @@ static void insert_mid_prod_rule(int ct)
   n->type = _NONTERMINAL;
   p->nLHS = createSymbolNode(n); 
   p->hasCode = 1;
+  p->RHS_count = ct;
 
   addRHSSymbol(n);
 }
