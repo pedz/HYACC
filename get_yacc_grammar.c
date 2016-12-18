@@ -45,9 +45,9 @@ char * strEnd = "$end";
 char * strEmpty = "";
 char * strError = "error"; // reserved word.
 
-static char * ysymbol; // token symbol.
-static int ysymbol_pt;
-static int ysymbol_size;
+char * ysymbol; // token symbol.
+int ysymbol_pt;
+int ysymbol_size;
 
 static SymbolTblNode * curLHS;
 

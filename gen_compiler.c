@@ -50,6 +50,11 @@ static char *yystype_format =
   "#endif\n"
   ;
 
+extern void addCharToSymbol(int c);
+extern char * ysymbol; // token symbol.
+extern int ysymbol_pt;
+extern int ysymbol_size;
+
 static void prepare_outfile()
 {
   if ((fp = fopen(y_tab_c, "w")) == NULL) {
@@ -245,10 +250,14 @@ static void processYaccFile_section2(char * filename)
   int CODE_LEVEL;
   BOOL READING_SYMBOL = FALSE;
   BOOL READING_NUMBER = FALSE;
+  BOOL READING_TYPE = FALSE;
   int dollar_number = 0;
   int c, last_c = 0, last_last_c = 0;
   int rule_count = 0;
   BOOL END_OF_CODE = FALSE; // for mid-production action.
+  char *explicit_type = 0;
+  SymbolTblNode *sym;
+  char *token_type;
   static char * padding = "        ";
 
   while ((c = getc(fp_yacc)) != EOF) {
@@ -356,13 +365,30 @@ static void processYaccFile_section2(char * filename)
         }
         break;
       case CODE: // the meat. write code to yacc output file.
-        if (last_c != '$' && c == '$') {
+	if (READING_TYPE) {
+	  if (c == '>') {
+	    READING_TYPE = FALSE;
+	    c = '$';
+	    addCharToSymbol('\0');
+	    explicit_type = ysymbol;
+	  } else {
+	    addCharToSymbol(c);
+	  }
+	} else if (last_c == '$' && c == '<') {
+	  ysymbol_pt = 0;
+	  READING_TYPE = TRUE;
+	} else if (last_c != '$' && c == '$') {
           // do nothing, this may be a special character.
         } else if (last_c == '$' && c == '$') {
-	  SymbolTblNode *sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
-	  char *token_type;
 
-	  if ((token_type = sym->token_type))
+	  if (explicit_type) {
+	    token_type = explicit_type;
+	    explicit_type = 0;
+	  } else {
+	    sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
+	    token_type = sym->token_type;
+	  }
+	  if (token_type)
 	    fprintf(fp, "(yyval.%s)", token_type);
 	  else
 	    fprintf(fp, "yyval");
@@ -374,10 +400,15 @@ static void processYaccFile_section2(char * filename)
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
 	  int RHS_count = grammar.rules[rule_count]->RHS_count;
-	  SymbolTblNode *sym = find_full_rule(rule_count, dollar_number);
-	  char *token_type;
 	  
-	  if ((token_type = sym->token_type))
+	  if (explicit_type) {
+	    token_type = explicit_type;
+	    explicit_type = 0;
+	  } else {
+	    sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
+	    token_type = sym->token_type;
+	  }
+	  if (token_type)
 	    fprintf(fp, "(yypvt[%d].%s)", dollar_number - RHS_count, token_type);
 	  else
 	    fprintf(fp, "yypvt[%d]", dollar_number - RHS_count);
