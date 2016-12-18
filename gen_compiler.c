@@ -202,13 +202,12 @@ static void goto_section3()
   }
 }
 
-static SymbolTblNode *find_full_rule(int rule_count, int dollar_number)
+static Production *find_full_rule(int rule_count)
 {
   Production *rule;
   SymbolNode *node;
   SymbolTblNode *sym;
   int full_rule;
-  int i;
 
   for (full_rule = rule_count; full_rule < grammar.rule_count; ++full_rule) {
 
@@ -222,6 +221,16 @@ static SymbolTblNode *find_full_rule(int rule_count, int dollar_number)
       exit(1);
     }
   }
+
+  return rule;
+}
+
+static SymbolTblNode *find_sym(Production *rule, int dollar_number)
+{
+  SymbolNode *node;
+  SymbolTblNode *sym;
+  int full_rule;
+  int i;
 
   if (dollar_number == MAX_RULE_LENGTH)
     return sym;
@@ -258,6 +267,7 @@ static void processYaccFile_section2(char * filename)
   int rule_count = 0;
   BOOL END_OF_CODE = FALSE; // for mid-production action.
   char *explicit_type = 0;
+  Production *rule;
   SymbolTblNode *sym;
   char *token_type;
   static char * padding = "        ";
@@ -387,8 +397,8 @@ static void processYaccFile_section2(char * filename)
 	    token_type = explicit_type;
 	    explicit_type = 0;
 	  } else {
-	    sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
-	    token_type = sym->token_type;
+	    rule = find_full_rule(rule_count);
+	    token_type = rule->nLHS->snode->token_type;
 	  }
 	  if (token_type)
 	    fprintf(fp, "(yyval.%s)", token_type);
@@ -401,19 +411,19 @@ static void processYaccFile_section2(char * filename)
         } else if (READING_NUMBER == TRUE && isdigit(c)) {
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
-	  int RHS_count = grammar.rules[rule_count]->RHS_count;
+	  rule = find_full_rule(rule_count);
 	  
 	  if (explicit_type) {
 	    token_type = explicit_type;
 	    explicit_type = 0;
 	  } else {
-	    sym = find_full_rule(rule_count, dollar_number);
+	    sym = find_sym(rule, dollar_number);
 	    token_type = sym->token_type;
 	  }
 	  if (token_type)
-	    fprintf(fp, "(yypvt[%d].%s)", dollar_number - RHS_count, token_type);
+	    fprintf(fp, "(yypvt[%d].%s)", (dollar_number - rule->RHS_count), token_type);
 	  else
-	    fprintf(fp, "yypvt[%d]", dollar_number - RHS_count);
+	    fprintf(fp, "yypvt[%d]", dollar_number - rule->RHS_count);
 
           putc(c, fp);
           READING_NUMBER = FALSE;
