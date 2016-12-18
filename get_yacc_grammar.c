@@ -1385,7 +1385,8 @@ void processYaccFileInput_section2()
           //printf("] terminal ends\n");
           yacc_sec2_state = RHS;
           output_nonterminal(TERMINAL); // OUTPUT NEXT RHS SYMBOL. is terminal.
-        } else if (! isspace(c)) {
+        } else {
+	  /* if (isspace(c)) printf("hit space here %d %d\n", n_line, n_col); */
           addCharToSymbol(c);
         }
         break;
