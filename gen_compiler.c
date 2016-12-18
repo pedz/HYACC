@@ -405,7 +405,7 @@ static void processYaccFile_section2(char * filename)
 	    token_type = explicit_type;
 	    explicit_type = 0;
 	  } else {
-	    sym = find_full_rule(rule_count, MAX_RULE_LENGTH);
+	    sym = find_full_rule(rule_count, dollar_number);
 	    token_type = sym->token_type;
 	  }
 	  if (token_type)
