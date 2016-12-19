@@ -235,7 +235,7 @@ static int find_mid_prod_index(Production *rule, Production *mid_prod_rule)
   char *r;
   int i;
 
-  for (i = 1, rnode = rule->nRHS_head; rnode; ++i, rnode = rnode->next)
+  for (i = 0, rnode = rule->nRHS_head; rnode; ++i, rnode = rnode->next)
     if (!((rsym = rnode->snode) &&
 	  (r = rsym->symbol))) {
       printf("Did not find mid production rule of %s", l);
