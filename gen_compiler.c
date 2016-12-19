@@ -225,11 +225,30 @@ static Production *find_full_rule(int rule_count)
   return rule;
 }
 
+static int find_mid_prod_index(Production *rule, Production *mid_prod_rule)
+{
+  SymbolNode *lnode = mid_prod_rule->nLHS;
+  SymbolTblNode *lsym = lnode->snode;
+  char *l = lsym->symbol;
+  SymbolNode *rnode;
+  SymbolTblNode *rsym;
+  char *r;
+  int i;
+
+  for (i = 1, rnode = rule->nRHS_head; rnode; ++i, rnode = rnode->next)
+    if (!((rsym = rnode->snode) &&
+	  (r = rsym->symbol))) {
+      printf("Did not find mid production rule of %s", l);
+      exit(1);
+    } else if (strcmp(l, r) == 0)
+      return i;
+  return -1;
+}
+
 static SymbolTblNode *find_sym(Production *rule, int dollar_number)
 {
   SymbolNode *node;
   SymbolTblNode *sym;
-  int full_rule;
   int i;
 
   if (dollar_number == MAX_RULE_LENGTH)
@@ -237,11 +256,11 @@ static SymbolTblNode *find_sym(Production *rule, int dollar_number)
 
   for (i = 1, node = rule->nRHS_head; i < dollar_number && node; ++i, node = node->next);
   if (i != dollar_number) {
-    printf("Rule %d terminated before %d RHS\n", full_rule, dollar_number);
+    printf("Rule terminated before %d RHS\n", dollar_number);
     exit(1);
   }
   if (!(sym = node->snode)) {
-    printf("Malformed grammar rule %d RHS %d had no symbol table node\n", full_rule, dollar_number);
+    printf("Malformed grammar rule RHS %d had no symbol table node\n", dollar_number);
     exit(1);
   }
   return sym;
@@ -411,10 +430,15 @@ static void processYaccFile_section2(char * filename)
         } else if (READING_NUMBER == TRUE && isdigit(c)) {
           dollar_number = (c - 48) + 10 * dollar_number;
         } else if (READING_NUMBER == TRUE && ! isdigit(c)) {
-	  int RHS_count = grammar.rules[rule_count]->RHS_count;
-
-	  rule = find_full_rule(rule_count);
+	  Production *start_rule = grammar.rules[rule_count];
+	  int RHS_index;
 	  
+	  rule = find_full_rule(rule_count);
+	  if (rule != start_rule)
+	    RHS_index = find_mid_prod_index(rule, start_rule);
+	  else
+	    RHS_index = rule->RHS_count;
+
 	  if (explicit_type) {
 	    token_type = explicit_type;
 	    explicit_type = 0;
@@ -423,9 +447,9 @@ static void processYaccFile_section2(char * filename)
 	    token_type = sym->token_type;
 	  }
 	  if (token_type)
-	    fprintf(fp, "(yypvt[%d].%s)/* %d %d */", (dollar_number - RHS_count), token_type, rule_count, RHS_count);
+	    fprintf(fp, "(yypvt[%d].%s)/* %d %d */", (dollar_number - RHS_index), token_type, rule_count, RHS_index);
 	  else
-	    fprintf(fp, "yypvt[%d]/* %d %d */", dollar_number - RHS_count, rule_count, RHS_count);
+	    fprintf(fp, "yypvt[%d]/* %d %d */", dollar_number - RHS_index, rule_count, RHS_index);
 
           putc(c, fp);
           READING_NUMBER = FALSE;

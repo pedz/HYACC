@@ -636,7 +636,7 @@ Production * createNewRule()
 static void insert_mid_prod_rule(int ct)
 {
   int ruleID;
-  Production *p, *o;
+  Production * p;
   char nameLHS[20];
   SymbolTblNode * n;
 
@@ -644,9 +644,8 @@ static void insert_mid_prod_rule(int ct)
 
   // switch the postion of the last two rules.
   ruleID = grammar.rule_count - 1; // last rule's pointer.
-  o = grammar.rules[ruleID - 1];
   p = grammar.rules[ruleID];
-  grammar.rules[ruleID]     = o;
+  grammar.rules[ruleID] = grammar.rules[ruleID - 1];
   grammar.rules[ruleID - 1] = p;
 
   // now fill the value of the new added rule.
@@ -655,7 +654,7 @@ static void insert_mid_prod_rule(int ct)
   n->type = _NONTERMINAL;
   p->nLHS = createSymbolNode(n); 
   p->hasCode = 1;
-  p->RHS_count = o->RHS_count;
+
   addRHSSymbol(n);
 }
 
