@@ -478,7 +478,7 @@ int n_state_opt12;
 int n_state_opt123;
 
 /* defined in hyacc_path.c, used in gen_compiler.c */
-char * HYACC_PATH;
+extern char *HYACC_PATH;
 
 
 /*************************
