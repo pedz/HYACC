@@ -50,22 +50,22 @@
 #define YYERROR goto yyerrlab
 #define YYRECOVERING() (!!yyerrflag) /* !! */
 #define YYMAX_STACK_CAPACITY 16384   /* 2^14 */
-int yystack_capacity = 256; /* initial stack capacity. */
+static int yystack_capacity = 256; /* initial stack capacity. */
 #define YYNEW(type) (type *) malloc((yystack_capacity) * sizeof(type))
 #define YYENLARGE(from, type) \
         (type *) realloc((void *) from, (yystack_capacity) * sizeof(type))
 #define YYERR_EXIT(errmsg) { printf("%s\n", errmsg); exit(1); }
 
 int yychar;     /* current input token number, i.e., lookahead. */
-FILE * yyparse_fp; /* output file to trace parse steps. */
-char * yyparse_file = "y.parse";
-int * yyps;     /* state stack. */
-int yyps_pt;    /* top of state stack: yyps+yyps_pt-1. */
+static FILE * yyparse_fp; /* output file to trace parse steps. */
+static char * yyparse_file = "y.parse";
+static int * yyps;     /* state stack. */
+static int yyps_pt;    /* top of state stack: yyps+yyps_pt-1. */
 YYSTYPE * yypv; /* value stack. */
-int yypv_pt;    /* top of value stack: yypv+yypv_pt-1. */
+static int yypv_pt;    /* top of value stack: yypv+yypv_pt-1. */
 #if YYDEBUG
-int * yypm;     /* symbol stack. */
-int yypm_pt;    /* top of symbol stack: yypm+yypm_pt-1. */
+static int * yypm;     /* symbol stack. */
+static int yypm_pt;    /* top of symbol stack: yypm+yypm_pt-1. */
 #endif
 
 int yynerrs;    /* number of errors */
@@ -81,7 +81,7 @@ YYSTYPE yyval;  /* "$$" used in production action. */
 #if YYDEBUG
 
 /* get token name from value of yychar. */
-char * yyget_tok(const int yychar)
+static char * yyget_tok(const int yychar)
 {
   static char c[1];
   int i;
@@ -99,7 +99,7 @@ char * yyget_tok(const int yychar)
   return "-none-";
 }
 
-void yywrite_stack(void)
+static void yywrite_stack(void)
 { 
   int i; 
   /* It's unknown what data type yypv is, so can't write here. */ 
@@ -183,7 +183,7 @@ void yywrite_stack(void)
  * state: yystate. lookahead: yychar.
  * return: 0 if success, -1 if fail, 1 if eat a token.
  */
-int yyerror_handler(int yystate)
+static int yyerror_handler(int yystate)
 {
   int yyaction;
   switch (yyerrflag) {
